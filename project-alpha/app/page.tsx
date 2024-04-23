@@ -1,34 +1,36 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { fetchTracks } from "./lib/data";
-import { useAudioPlayer } from "./context/audioContext";
-// import AudioPlayer from "./ui/Player/Player";
+import { useEffect, useState } from "react";
+import { fetchEpisodes } from "@/app/lib/data";
+import { Episode } from "@/app/lib/definitions";
+import usePlayer from "@/app/utils/hooks/usePlayer";
 
 export default function Home() {
-    const [trackList, setTrackList] = useState<any>([]);
-    const { setCurrTrack } = useAudioPlayer();
+    const [episodeList, setEpisodeList] = useState<Episode[]>([]);
+    const { setEpisode } = usePlayer();
 
     useEffect(() => {
-        const getTracks = async () => {
-            const data = await fetchTracks();
-            console.log(data);
+        const getEpisodeList = async () => {
+            const data = await fetchEpisodes();
 
-            setTrackList(data);
+            setEpisodeList(data);
         };
 
-        getTracks();
+        getEpisodeList();
     }, []);
+
+    const handleClick = (episode: Episode) => {
+        setEpisode(episode);
+    };
 
     return (
         <main className="flex min-h-screen flex-col items-center">
             <h1 className="text-4xl font-bold text-gray-900">Welcome to Project Alpha!</h1>
             <div className="flex flex-wrap gap-2">
-                {trackList.map((track: any) => (
-                    <div className="" key={track.id} onClick={() => setCurrTrack(track)}>
-                        <div className="text-grey-50">{track.title}</div>
-                        <div className="text-grey-300">{track.author}</div>
-                    </div>
+                {episodeList.map((episode: Episode) => (
+                    <button className="" key={episode.id} onClick={() => handleClick(episode)}>
+                        <div className="text-grey-50">{episode.title}</div>
+                    </button>
                 ))}
             </div>
         </main>

@@ -1,10 +1,14 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 import NavLinks from "@/app/ui/Aside/nav-links";
 import UserProfile from "./User";
 import Image from "next/image";
 import { Bars3Icon } from "@heroicons/react/24/outline";
+import usePlayer from "../../utils/hooks/usePlayer";
 
 export default function SideNav() {
+
     return (
         <div className="flex h-full flex-col px-3 py-4 md:px-2">
             <div className="mb-2 flex items-center justify-between rounded-md bg-gray-950 p-4">
