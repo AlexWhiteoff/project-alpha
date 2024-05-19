@@ -1,36 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchEpisodes } from "@/app/lib/data";
-import { Episode } from "@/app/lib/definitions";
-import usePlayer from "@/app/utils/hooks/usePlayer";
+import { fetchAllPodcasts } from "@/app/lib/data";
+import { Podcast } from "@/app/lib/definitions";
+import Card from "@/app/ui/Card";
 
 export default function Home() {
-    const [episodeList, setEpisodeList] = useState<Episode[]>([]);
-    const { setEpisode } = usePlayer();
+    const [podcastList, setPodcastList] = useState<Podcast[]>([]);
 
     useEffect(() => {
-        const getEpisodeList = async () => {
-            const data = await fetchEpisodes();
+        const getPodcastList = async () => {
+            const data = await fetchAllPodcasts();
 
-            setEpisodeList(data);
+            setPodcastList(data);
         };
 
-        getEpisodeList();
+        getPodcastList();
     }, []);
-
-    const handleClick = (episode: Episode) => {
-        setEpisode(episode);
-    };
 
     return (
         <main className="flex min-h-screen flex-col items-center">
             <h1 className="text-4xl font-bold text-gray-900">Welcome to Project Alpha!</h1>
             <div className="flex flex-wrap gap-2">
-                {episodeList.map((episode: Episode) => (
-                    <button className="" key={episode.id} onClick={() => handleClick(episode)}>
-                        <div className="text-grey-50">{episode.title}</div>
-                    </button>
+                {podcastList.map((podcast: Podcast) => (
+                    <Card podcast={podcast} key={podcast.id} />
                 ))}
             </div>
         </main>

@@ -5,6 +5,7 @@ import { usePodcastContext } from "@/app/utils/context/podcastContext";
 import { Episode } from "@/app/lib/definitions";
 import { useEffect, useRef, useState } from "react";
 
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 interface UsePlayer {
     isPlaying: boolean;
     playAudio: () => void;
@@ -19,20 +20,15 @@ const usePlayer = (): UsePlayer => {
     const currentEpisode = state.currentEpisode;
 
     const playAudio = () => {
-        if (audioRef.current?.readyState !== 0) {
-            audioRef.current?.play();
-            setIsPlaying(true);
-        }
+        audioRef.current?.play();
+        setIsPlaying(true);
     };
     const pauseAudio = () => {
-        if (audioRef.current?.readyState !== 0) {
-            audioRef.current?.pause();
-            setIsPlaying(false);
-        }
+        audioRef.current?.pause();
+        setIsPlaying(false);
     };
 
-    useEffect(() => { 
-
+    useEffect(() => {
         const handleEnded = () => {
             setIsPlaying(false);
         };
@@ -46,11 +42,10 @@ const usePlayer = (): UsePlayer => {
     }, [audioRef]);
 
     useEffect(() => {
-        console.log("useEffect:\naudioRef.current: ", audioRef.current?.readyState);
-
         if (currentEpisode && audioRef.current) {
-            audioRef.current.src = currentEpisode.src;
-            playAudio();
+            const src = baseURL + "/" + currentEpisode.src;
+            console.log(src);
+            audioRef.current.src = src;
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentEpisode]);

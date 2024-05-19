@@ -6,7 +6,12 @@ export type Podcast = {
     name: string;
     description: string;
     creator_id: string;
+    image: string;
     created_at: string;
+    brief: string;
+    categories: string[];
+    tags: string[];
+    key_words: string[];
 };
 
 export type Episode = {

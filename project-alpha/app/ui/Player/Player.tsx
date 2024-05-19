@@ -49,7 +49,7 @@ const Player = () => {
                 <input
                     type="range"
                     className="hidden md:block w-full h-2 bg-gray-700 rounded-full cursor-pointer focus:outline-none"
-                    value={0} 
+                    defaultValue={0} 
                     min={0}
                     max={100}
                 />

@@ -8,10 +8,8 @@ import {
     MagnifyingGlassIcon as outlineMagnifyingGlassIcon,
     HomeIcon as outlineHomeIcon,
 } from "@heroicons/react/24/outline";
-import { 
-    MagnifyingGlassIcon as solidMagnifyingGlassIcon, 
-    HomeIcon as solidHomeIcon 
-} from "@heroicons/react/24/solid";
+import { MagnifyingGlassIcon as solidMagnifyingGlassIcon, HomeIcon as solidHomeIcon } from "@heroicons/react/24/solid";
+import Image from "next/image";
 
 const links = [
     {
@@ -33,6 +31,13 @@ export default function NavLinks() {
 
     return (
         <>
+            <div
+                className={clsx(
+                    "flex md:hidden h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-gray-100 hover:text-gray-600 md:flex-none md:justify-start md:p-2 md:px-3"
+                )}
+            >
+                <Image src="/light_logo_without_text_transparent.png" alt="logo image" width={40} height={40} />
+            </div>
             {links.map((link) => {
                 const LinkIcon = pathname === link.href ? link.iconSolid : link.iconOutline;
                 return (

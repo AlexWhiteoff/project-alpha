@@ -21,14 +21,14 @@ export default function RootLayout({
             <AudioRefContext.Provider value={{ audioRef }}>
                 <html lang="en">
                     <body className={`${inter.className} antialised flex flex-col h-screen overflow-hidden`}>
-                        <audio ref={audioRef} hidden autoPlay={false} preload="auto" />
+                        <audio ref={audioRef} hidden preload="auto" />
                         <div className="flex h-screen flex-col-reverse md:flex-row md:overflow-hidden">
                             <div className="w-full flex-none md:w-64">
                                 <SideNav />
                             </div>
                             <div className="flex-grow px-6 mt-4 overflow-y-auto md:px-12">{children}</div>
                         </div>
-                        <div className="w-full absolute md:relative px-2 py-4">
+                        <div className="w-full hidden b-0 md:block px-2 py-4">
                             <Player />
                         </div>
                     </body>
