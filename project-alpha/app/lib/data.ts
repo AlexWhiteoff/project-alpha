@@ -1,4 +1,6 @@
-import { Episode, Podcast } from "@/app/lib/definitions";
+import { Episode, Podcast, User } from "@/app/lib/definitions";
+import { sql } from "@vercel/postgres";
+import { unstable_noStore as noStore } from "next/cache";
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export async function fetchEpisodes(id: string) {
@@ -28,4 +30,28 @@ export async function fetchAllPodcasts() {
         .catch((err) => console.log(err));
     console.log("Podcasts: ", res);
     return res;
+}
+
+export async function getUserByEmail(email: string) {
+    noStore();
+
+    try {
+        const user = await sql<User>`SELECT * FROM users WHERE email=${email}`;
+        return user.rows[0] as User;
+    } catch (error) {
+        console.error("Failed to fetch user:", error);
+        throw new Error("Failed to fetch user.");
+    }
+}
+
+export async function getUserById(id: string) {
+    noStore();
+
+    try {
+        const user = await sql<User>`SELECT * FROM users WHERE email=${id}`;
+        return user.rows[0] as User;
+    } catch (error) {
+        console.error("Failed to fetch user:", error);
+        throw new Error("Failed to fetch user.");
+    }
 }

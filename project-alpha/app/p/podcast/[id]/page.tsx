@@ -4,7 +4,7 @@ import usePlayer from "@/app/utils/hooks/usePlayer";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-export default async function Page({ params }: { params: { id: string } }) {
+export default async function PodcastPage({ params }: { params: { id: string } }) {
     const id = params.id;
     const [podcast, episodes] = await Promise.all([fetchPodcast(id), fetchEpisodes(id)]);
 

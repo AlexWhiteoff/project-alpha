@@ -1,9 +1,9 @@
 import { fetchEpisode } from "@/app/lib/data";
-import PlayButton from "@/app/ui/playButton";
+import PlayButton from "@/app/ui/Player/playButton";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-export default async function Page({ params }: { params: { id: string } }) {
+export default async function EpisodePage({ params }: { params: { id: string } }) {
     const id = params.id;
     const [episode] = await Promise.all([fetchEpisode(id)]);
 

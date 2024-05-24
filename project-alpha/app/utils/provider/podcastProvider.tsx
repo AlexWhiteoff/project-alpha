@@ -1,3 +1,5 @@
+"use client"
+
 import { ReactNode, useReducer } from "react";
 import PodcastContext, { PodcastState } from "@/app/utils/context/podcastContext";
 import { podcastReducer } from "@/app/utils/reducer/podcastReducer";
