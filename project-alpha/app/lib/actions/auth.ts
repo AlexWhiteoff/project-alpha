@@ -7,10 +7,11 @@ import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
 import bcrypt from "bcrypt";
 import { createSession, deleteSession } from "@/app/lib/actions/session";
-import { signIn } from "@/auth";
+import { getUserByEmail } from "../data";
+import { error } from "console";
+// import { signIn } from "@/auth";
 
 export async function signup(state: FormState, formData: FormData) {
-    console.log(formData);
     const validatedFields = SignupFormSchema.safeParse({
         email: formData.get("email"),
         password: formData.get("password"),
@@ -29,6 +30,15 @@ export async function signup(state: FormState, formData: FormData) {
     }
 
     const { email, password, username, birthday_day, birthday_month, birthday_year, gender } = validatedFields.data;
+
+    const user = await getUserByEmail(email);
+    if (user) {
+        return {
+            errors: email,
+            message: "This email address already in use.",
+        };
+    }
+
     const birthday_date = `${birthday_year}-${birthday_month}-${birthday_day}`;
     const hashedPassword = await bcrypt.hash(password, 10);
     try {
@@ -40,17 +50,15 @@ export async function signup(state: FormState, formData: FormData) {
 
         const user = result.rows[0];
 
+        console.log(user);
+
         if (!user) {
             return {
                 message: "An error occurred while creating your account.",
             };
         }
-        const authData = new FormData();
 
-        authData.append("email", email);
-        authData.append("password", password);
-
-        await authenticate(undefined, authData);
+        await createSession(user.id, user.role as "user" | "admin" | "content_creator", username, null);
     } catch (error) {
         return {
             message: "Database Error: Failed to create user.",
@@ -62,18 +70,42 @@ export async function signup(state: FormState, formData: FormData) {
     redirect("/p/");
 }
 
-export async function authenticate(prevState: string | undefined, formData: FormData) {
-    try {
-        await signIn("credentials", formData);
-    } catch (error) {
-        if (error instanceof AuthError) {
-            switch (error.type) {
-                case "CredentialsSignin":
-                    return "Invalid credentials";
-                default:
-                    return "Something went wrong.";
-            }
-        }
-        throw error;
+export async function signIn(state: { message: string } | undefined, formData: FormData) {
+    const validatedFields = SigninFormSchema.safeParse({
+        email: formData.get("email"),
+        password: formData.get("password"),
+    });
+
+    if (!validatedFields.success) {
+        return {
+            message: "Invalid credentials.",
+        };
     }
+
+    const { email, password } = validatedFields.data;
+
+    const user = await getUserByEmail(email);
+
+    if (!user) {
+        return {
+            message: "Something went wrong.",
+        };
+    }
+
+    const passwordsMatch = await bcrypt.compare(password, user.password);
+
+    if (passwordsMatch) await createSession(user.id, user.role, user.username, user.avatar_url);
+    else
+        return {
+            message: "Invalid credentials.",
+        };
+
+    revalidatePath("/");
+    redirect("/p/");
+}
+
+export async function signOut() {
+    await deleteSession();
+    revalidatePath("/");
+    redirect("/");
 }
