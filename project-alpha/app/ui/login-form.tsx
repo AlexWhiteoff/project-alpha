@@ -5,10 +5,10 @@ import { Button } from "@/app/ui/button";
 import { useState } from "react";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { lusitana } from "@/app/ui/fonts";
-import { authenticate } from "@/app/lib/actions/auth";
+import { signIn } from "@/app/lib/actions/auth";
 
 export default function LoginForm() {
-    const [errorMessage, dispatch] = useFormState(authenticate, undefined);
+    const [errorMessage, dispatch] = useFormState(signIn, undefined);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     const togglePasswordVisibility = () => {
@@ -37,11 +37,6 @@ export default function LoginForm() {
                                 />
                             </div>
                         </div>
-                        {errorMessage && (
-                            <div className="text-sm">
-                                <span className="text-red-500">{errorMessage}</span>
-                            </div>
-                        )}
                     </div>
                 </div>
                 <div className="my-4">
@@ -66,6 +61,11 @@ export default function LoginForm() {
                         </button>
                     </div>
                 </div>
+                {errorMessage && (
+                    <div className="text-sm">
+                        <span className="text-red-500">{errorMessage.message}</span>
+                    </div>
+                )}
                 <LoginButton />
             </div>
         </form>
