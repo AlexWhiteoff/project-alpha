@@ -5,7 +5,7 @@ import { fetchAllPodcasts } from "@/app/lib/data";
 import { Podcast } from "@/app/lib/definitions";
 import Card from "@/app/ui/Card";
 
-export default function Home() {
+export default function Page() {
     const [podcastList, setPodcastList] = useState<Podcast[]>([]);
 
     useEffect(() => {
@@ -19,7 +19,7 @@ export default function Home() {
     }, []);
 
     return (
-        <main className="flex min-h-screen flex-col items-center">
+        <main className="flex min-h-full flex-col items-center">
             <h1 className="text-4xl font-bold text-gray-900">Welcome to Project Alpha!</h1>
             <div className="flex flex-wrap gap-2">
                 {podcastList.map((podcast: Podcast) => (

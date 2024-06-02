@@ -1,12 +1,12 @@
 /*
  * This script is responsible for seeding the vercel database.
- * 
+ *
  * To seed the database, follow these steps:
- * 
+ *
  * 1. Install the required dependencies using the command: npm install.
  * 2. Configure the database connection parameters in the .env file.
  * 3. Run the script using the command: npm run seed.
-*/
+ */
 
 const { db } = require("@vercel/postgres");
 
@@ -58,7 +58,7 @@ async function seedPodcasts(client) {
                 is_active BOOLEAN DEFAULT TRUE,
                 comments_enabled BOOLEAN DEFAULT TRUE,
                 access_token UUID DEFAULT uuid_generate_v4(),
-                status VARCHAR(20) DEFAULT 'Announced',
+                status VARCHAR(20) DEFAULT 'pending',
                 age_rating VARCHAR(20) DEFAULT NULL,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                 updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -129,13 +129,13 @@ async function seedPodcastCategories(client) {
 
         // Create the "podcastCategories " table if it doesn't exist
         const createTable = await client.sql`
-            CREATE TABLE IF NOT EXISTS podcastCategories (
-                podcast_id UUID,
-                category_id UUID,
-                PRIMARY KEY (podcast_id, category_id),
-                FOREIGN KEY (podcast_id) REFERENCES podcasts(id) ON DELETE CASCADE,
-                FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
-            );
+                CREATE TABLE IF NOT EXISTS podcastCategories (
+                    podcast_id UUID,
+                    category_id UUID,
+                    PRIMARY KEY (podcast_id, category_id),
+                    FOREIGN KEY (podcast_id) REFERENCES podcasts(id) ON DELETE CASCADE,
+                    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+                );
         `;
 
         console.log(`Created "podcastCategories" table`);

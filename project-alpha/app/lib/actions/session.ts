@@ -3,14 +3,10 @@
 import { cookies } from "next/headers";
 import { encrypt, decrypt } from "@/app/lib/jwtEncoding";
 import { NextRequest, NextResponse } from "next/server";
+import { SessionPayload } from "@/app/lib/definitions";
 
-export async function createSession(
-    userId: string,
-    role: "admin" | "content_creator" | "user",
-    name: string,
-    avatar_url: string | null | undefined
-) {
-    const session = await encrypt({ userId, role });
+export async function createSession({ userId, role, name, avatar_url }: SessionPayload) {
+    const session = await encrypt({ userId, role, name, avatar_url });
 
     const expires = new Date(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
     cookies().set("session", session, {
@@ -25,7 +21,7 @@ export async function createSession(
 export async function getSession() {
     const session = cookies().get("session")?.value;
     if (!session) return null;
-    return await decrypt(session);
+    return (await decrypt(session)) as SessionPayload;
 }
 
 export async function updateSession(req: NextRequest) {

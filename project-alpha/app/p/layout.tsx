@@ -20,9 +20,9 @@ export default function Layout({
                     <div className="w-full flex-none md:w-64">
                         <SideNav />
                     </div>
-                    <div className="flex-grow md:px-6 mt-4 overflow-y-auto md:px-12">{children}</div>
+                    <div className="flex-grow md:px-6 md:py-4 overflow-y-auto md:px-12">{children}</div>
                 </div>
-                <div className="w-full hidden b-0 md:block px-2 py-4">
+                <div className="fixed w-full hidden bottom-0 left-0 md:block px-2 py-4">
                     <Player />
                 </div>
             </AudioRefContext.Provider>
