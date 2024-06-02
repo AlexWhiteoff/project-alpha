@@ -1,6 +1,6 @@
 "use server";
 
-import { SignupFormSchema, FormState, SigninFormSchema } from "@/app/lib/definitions";
+import { SignupFormSchema, UserFormState, SigninFormSchema, SessionPayload } from "@/app/lib/definitions";
 import { sql } from "@vercel/postgres";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -11,7 +11,7 @@ import { getUserByEmail } from "../data";
 import { error } from "console";
 // import { signIn } from "@/auth";
 
-export async function signup(state: FormState, formData: FormData) {
+export async function signUp(state: UserFormState, formData: FormData) {
     const validatedFields = SignupFormSchema.safeParse({
         email: formData.get("email"),
         password: formData.get("password"),
@@ -34,7 +34,6 @@ export async function signup(state: FormState, formData: FormData) {
     const user = await getUserByEmail(email);
     if (user) {
         return {
-            errors: email,
             message: "This email address already in use.",
         };
     }
@@ -44,21 +43,19 @@ export async function signup(state: FormState, formData: FormData) {
     try {
         const result = await sql`
         INSERT INTO users (email, password, username, birthday_date, gender)
-        VALUES (${email}, ${hashedPassword}, ${username}, ${birthday_date}, ${gender})
+        VALUES (${email.toLowerCase()}, ${hashedPassword}, ${username}, ${birthday_date}, ${gender})
         RETURNING id, role;
         `;
 
         const user = result.rows[0];
 
-        console.log(user);
-
         if (!user) {
             return {
-                message: "An error occurred while creating your account.",
+                message: "Під час створення вашого облікового запису виникла помилка.",
             };
         }
 
-        await createSession(user.id, user.role as "user" | "admin" | "content_creator", username, null);
+        await createSession({ userId: user.id, role: user.role, name: username, avatar_url: null });
     } catch (error) {
         return {
             message: "Database Error: Failed to create user.",
@@ -84,7 +81,7 @@ export async function signIn(state: { message: string } | undefined, formData: F
 
     const { email, password } = validatedFields.data;
 
-    const user = await getUserByEmail(email);
+    const user = await getUserByEmail(email.toLowerCase());
 
     if (!user) {
         return {
@@ -94,7 +91,8 @@ export async function signIn(state: { message: string } | undefined, formData: F
 
     const passwordsMatch = await bcrypt.compare(password, user.password);
 
-    if (passwordsMatch) await createSession(user.id, user.role, user.username, user.avatar_url);
+    if (passwordsMatch)
+        await createSession({ userId: user.id, role: user.role, name: user.username, avatar_url: user.avatar_url });
     else
         return {
             message: "Invalid credentials.",

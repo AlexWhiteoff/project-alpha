@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { Button } from "@/app/ui/button";
-import { signup } from "@/app/lib/actions/auth";
+import { signUp } from "@/app/lib/actions/auth";
 import { ChevronLeftIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
@@ -534,7 +534,7 @@ const AgreeAcknowledgeBlock = () => {
 
 export default function SignupForm() {
     const [step, setStep] = useState<number>(0);
-    const [state, dispatch] = useFormState(signup, undefined);
+    const [state, dispatch] = useFormState(signUp, undefined);
     const steps = ["Create a password", "Tell about yourself", "Agreements and Acknowledgments"];
     const router = useRouter();
 
@@ -560,7 +560,6 @@ export default function SignupForm() {
     }, [step]);
 
     const handleSubmit = (formData: FormData) => {
-
         if (!email || !password || !username || !birthday.day || !birthday.month || !birthday.year || !gender) {
             return;
         }
@@ -581,7 +580,7 @@ export default function SignupForm() {
             <div className="px-6 pb-4 pt-16">
                 {step > 0 && (
                     <div className="mx-auto">
-                        <div className="w-[520px] bg-[#2d2827] h-1 rounded mb-8">
+                        <div className="md:w-[520px] bg-[#2d2827] h-1 rounded mb-8">
                             <div
                                 className={clsx(" transition-all relative bg-[#3B82F6] h-1 rounded mb-4", {
                                     "w-[0%]": step === 0,
@@ -597,14 +596,14 @@ export default function SignupForm() {
                                     <ChevronLeftIcon className="w-12 text-gray-400" />
                                 </button>
                             </div>
-                            <div className="flex w-[400px] gap-2 flex-col">
+                            <div className="flex md:w-[400px] gap-2 flex-col">
                                 <span className="text-gray-400">Step {step} of 3</span>
                                 <h2>{steps[step - 1]}</h2>
                             </div>
                         </div>
                     </div>
                 )}
-                <div className="mx-auto w-[400px]">
+                <div className="mx-auto md:w-[400px]">
                     {step === 0 && (
                         <EmailBlock
                             NextStep={() => NextStep()}

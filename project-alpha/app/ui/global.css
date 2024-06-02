@@ -20,9 +20,12 @@
 body {
     color: rgb(var(--foreground-rgb));
     background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+    user-select: none;
 }
 
-input, select, option {
+input,
+select,
+option {
     color: rgb(var(--input-rgb));
 }
 
@@ -30,4 +33,25 @@ input, select, option {
     .text-balance {
         text-wrap: balance;
     }
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+ 
+/* Track */
+::-webkit-scrollbar-track {
+    background: unset;
+    border-radius: 5px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: rgb(var(--background-start-rgb));
+    border-radius: 5px;
+}
+ 
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
