@@ -4,7 +4,7 @@ import { PlayIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
 
-const EpisodeList = ({ episodes }: { episodes: Episode[] }) => {
+const EpisodeList = ({ podcastId, episodes }: { podcastId: string; episodes: Episode[] }) => {
     return (
         <div className="flex flex-wrap flex-col gap-4 divide-y divide-gray-300">
             {episodes.map((episode: Episode) => (
@@ -15,7 +15,12 @@ const EpisodeList = ({ episodes }: { episodes: Episode[] }) => {
                 >
                     <div>
                         <div className="w-[100px] h-[100px] rounded overflow-hidden">
-                            <Image alt={episode.title} src={episode.image} width={100} height={100} />
+                            <Image
+                                alt={episode.title}
+                                src={`/assets/podcasts/${podcastId}/${episode.image_url}`}
+                                width={100}
+                                height={100}
+                            />
                         </div>
                     </div>
                     <div>

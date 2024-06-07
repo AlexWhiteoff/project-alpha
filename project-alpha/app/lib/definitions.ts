@@ -75,8 +75,16 @@ export const PodcastFormSchema = z.object({
     age_rating: z.enum(["0", "6+", "12+", "16+", "18+"], { message: "Оберіть вікову категорію." }),
     created_at: z.string(),
     updated_at: z.string(),
-    // categories: z.array(string(), { message: "Виберіть категорії зі списку." }),
-    // tags: z.array(string(), { message: "Оберіть теги зі списку." }),
+});
+
+export const addToBookmarkSchema = z.object({
+    podcast_id: z.string(),
+    user_id: z.string(),
+    list_type: z.enum(["listening", "planned", "abandoned", "finished", "favorite"], {
+        message: "Обраного списку не існує.",
+    }),
+    created_at: z.string(),
+    updated_at: z.string(),
 });
 
 export type PodcastFormState =
@@ -84,12 +92,10 @@ export type PodcastFormState =
           errors?: {
               title?: string[];
               description?: string[];
-              avatar_url?: string[];
-              banner_url?: string[];
+              avatar?: string[];
+              banner?: string[];
               status?: string[];
               age_rating?: string[];
-              categories?: string[];
-              tags?: string[];
           };
           message?: string;
       }
@@ -109,6 +115,8 @@ export type UserFormState =
           message?: string;
       }
     | undefined;
+
+export type BookmarksFormState = { status?: string; errors?: { list_type?: string[] } } | undefined;
 
 export type SessionPayload = {
     userId: string;
@@ -141,7 +149,7 @@ export type Podcast = {
     is_active: boolean;
     comments_enabled: boolean;
     access_token: string;
-    status: "pending" | "announced" | "ongoing" | "published" | "discontinued" | "archived";
+    status: "pending" | "announced" | "ongoing" | "published" | "discontinued";
     age_rating: "0" | "6+" | "12+" | "16+" | "18+";
     created_at: string;
     updated_at: string;
@@ -156,11 +164,21 @@ export type Episode = {
     image_url: string;
     duration: number;
     release_date: string;
-    episode_number: number;
     is_active: boolean;
-    access_key: string;
     created_at: string;
     updated_at: string;
+};
+
+export type EpisodeTable = {
+    id: string;
+    podcast_id: string;
+    title: string;
+    description: string;
+    audio_url: string;
+    image_url: string;
+    duration: number;
+    release_date: string;
+    is_active: boolean;
 };
 
 export type Categories = {
@@ -174,10 +192,9 @@ export type Tags = {
 };
 
 export type Bookmarks = {
-    id: string;
     user_id: string;
     podcast_id: string;
-    list_type: string;
+    list_type: "listening" | "planned" | "abandoned" | "finished" | "favorite"; // Слухаю, Заплановані, Покинуті, Прослухано, Улюблені
     created_at: string;
     updated_at: string;
 };
@@ -187,7 +204,6 @@ export type Ratings = {
     user_id: string;
     podcast_id: string;
     rating: number;
-    content: string;
     created_at: string;
 };
 

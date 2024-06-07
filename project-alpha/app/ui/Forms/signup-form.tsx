@@ -557,7 +557,7 @@ export default function SignupForm() {
 
     useEffect(() => {
         router.replace(`/signup#step=${step}`);
-    }, [step]);
+    }, [step, router]);
 
     const handleSubmit = (formData: FormData) => {
         if (!email || !password || !username || !birthday.day || !birthday.month || !birthday.year || !gender) {

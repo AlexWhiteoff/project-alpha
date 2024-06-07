@@ -217,12 +217,12 @@ async function seedBookmarks(client) {
         // Create the "bookmarks" table if it doesn't exist
         const createTable = await client.sql`
             CREATE TABLE IF NOT EXISTS bookmarks (
-                id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
                 user_id UUID NOT NULL,
                 podcast_id UUID NOT NULL,
-                list_type VARCHAR(50) NOT NULL DEFAULT 'Listening',
+                list_type VARCHAR(50) NOT NULL DEFAULT 'listening',
                 created_at TIMESTAMP DEFAULT NOW(),
                 updated_at TIMESTAMP DEFAULT NOW(),
+                PRIMARY KEY (user_id, podcast_id),
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
                 FOREIGN KEY (podcast_id) REFERENCES podcasts(id) ON DELETE CASCADE
             );
