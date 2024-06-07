@@ -25,8 +25,8 @@ export default function PodcastCreateForm({ categories, tags }: PodcastFormProps
     const handleSubmit = (data: FormData) => {
         data.set("avatar", avatar as File);
         data.set("banner", banner ? banner : "");
-        data.set('categories', JSON.stringify(selectedCategories));
-        data.set('tags', JSON.stringify(selectedTags));
+        data.set("categories", JSON.stringify(selectedCategories));
+        data.set("tags", JSON.stringify(selectedTags));
 
         dispatch(data);
     };
@@ -172,7 +172,12 @@ export default function PodcastCreateForm({ categories, tags }: PodcastFormProps
                     <label htmlFor="categories" className="block text-sm font-medium text-neutral-400">
                         Категорії
                     </label>
-                    <MultipleSelect type="Категорії" options={categories} setValue={setSelectedCategories} />
+                    <MultipleSelect
+                        type="Категорії"
+                        options={categories}
+                        values={selectedCategories}
+                        setValue={setSelectedCategories}
+                    />
                 </div>
 
                 {/* Tags */}
@@ -180,7 +185,7 @@ export default function PodcastCreateForm({ categories, tags }: PodcastFormProps
                     <label htmlFor="tags" className="block text-sm font-medium text-neutral-400">
                         Теги
                     </label>
-                    <MultipleSelect type="Теги" options={tags} setValue={setSelectedTags} />
+                    <MultipleSelect type="Теги" options={tags} values={selectedTags} setValue={setSelectedTags} />
                 </div>
             </div>
 

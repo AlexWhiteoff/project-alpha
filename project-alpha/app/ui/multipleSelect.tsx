@@ -1,5 +1,6 @@
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
+import { Categories, Tags } from "@/app/lib/definitions";
 
 interface Options {
     id: string;
@@ -9,16 +10,16 @@ interface Options {
 interface MultipleSelectProps {
     type: string;
     options: Options[];
+    values: string[];
     setValue: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export default function MultipleSelect({ type, options, setValue }: MultipleSelectProps) {
-    const [selected, setSelected] = useState<string[]>([]);
+export default function MultipleSelect({ type, options, values, setValue }: MultipleSelectProps) {
     const [isDdOpen, setIsDdOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const handleChange = (option: string) => {
-        setSelected((prevState) => {
+        setValue((prevState) => {
             if (prevState.includes(option)) {
                 return prevState.filter((item) => item !== option);
             } else {
@@ -27,10 +28,6 @@ export default function MultipleSelect({ type, options, setValue }: MultipleSele
         });
     };
 
-    useEffect(() => {
-        setValue(selected);
-    }, [selected, setValue]);
-
     const handleBlur = (event: React.FocusEvent<HTMLElement>) => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.relatedTarget as Node)) {
             setIsDdOpen(false);
@@ -38,7 +35,7 @@ export default function MultipleSelect({ type, options, setValue }: MultipleSele
     };
 
     const handleRemove = (option: string) => {
-        setSelected((prevState) => prevState.filter((item) => item !== option));
+        setValue((prevState) => prevState.filter((item) => item !== option));
     };
 
     return (
@@ -68,7 +65,7 @@ export default function MultipleSelect({ type, options, setValue }: MultipleSele
                                 >
                                     <div
                                         className={`${
-                                            selected.includes(option.name) ? "bg-blue-300" : ""
+                                            values.includes(option.name) ? "bg-blue-300" : ""
                                         } w-2 h-2 rounded-full mr-3`}
                                     ></div>
                                     {option.name}
@@ -78,7 +75,7 @@ export default function MultipleSelect({ type, options, setValue }: MultipleSele
                     </div>
                 </div>
                 <div className="flex items-center flex-wrap gap-2 justify-start w-full">
-                    {selected.map((option) => (
+                    {values.map((option) => (
                         <div
                             className="transition-all flex items-center gap-2 border border-blue-600 px-2 py-1 rounded-md hover:bg-neutral-700"
                             key={option}

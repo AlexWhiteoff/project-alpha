@@ -23,19 +23,19 @@ export default async function Page({ params }: { params: { id: string } }) {
             value: format(user.birthday_date, "MM/dd/yyyy"),
         },
         {
-            label: "Gender",
+            label: "Ґендер/стать",
             value:
                 user.gender === "male"
-                    ? "Male"
+                    ? "Чоловіча"
                     : user.gender === "female"
-                    ? "Female"
+                    ? "Жіноча"
                     : user.gender === "non_binary"
-                    ? "Non-binary"
+                    ? "Небінарна особа"
                     : user.gender === "something_else"
-                    ? "Something else"
+                    ? "Щось інше"
                     : user.gender === "prefer_not_to_say"
-                    ? "Prefer not to say"
-                    : "Other",
+                    ? "Віддаю перевагу не називати"
+                    : "Інше",
         },
     ];
 
@@ -73,7 +73,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                                 }
                             >
                                 <Cog6ToothIcon className="w-6" />
-                                <p>Settings</p>
+                                <p>Налаштування</p>
                             </Link>
                         </div>
                     </div>
