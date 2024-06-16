@@ -6,6 +6,12 @@ import {
     PodcastFormSchema,
     PodcastFormState,
     addToBookmarkSchema,
+    EpisodeFormState,
+    EpisodeFormSchema,
+    EditEpisodeFormSchema,
+    UserFormState,
+    UserFormSchema,
+    SessionPayload,
 } from "@/app/lib/definitions";
 import { sql } from "@vercel/postgres";
 import {
@@ -16,48 +22,43 @@ import {
     getPodcastTags,
     getUserBookmarkByPodcastId,
 } from "../data";
-import { v4 } from "uuid";
-import path from "path";
-import fs from "fs";
-import { getSession } from "./session";
+import { v4, validate } from "uuid";
+import { editSession, getSession } from "./session";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-
-const saveImage = async (image_url: string, podcastId: string, imageFile: File) => {
-    const folderPath = path.join(process.cwd(), "public", "assets", "podcasts", podcastId);
-
-    const avatarBuffer = await imageFile.arrayBuffer();
-
-    !fs.existsSync(folderPath) && fs.mkdirSync(folderPath, { recursive: true });
-
-    const newFilePath = path.join(folderPath, image_url);
-
-    fs.writeFileSync(newFilePath, Buffer.from(avatarBuffer));
-};
-
-const overwriteImage = async (relative_file_path: string, imageFile: File) => {
-    const avatarBuffer = await imageFile.arrayBuffer();
-
-    const filePath = path.join(process.cwd(), "public", relative_file_path);
-
-    fs.writeFileSync(filePath, Buffer.from(avatarBuffer));
-};
-
-const removePodcastFiles = async (folderPath: string) => {
-    fs.rm(folderPath, { recursive: true, force: true }, (err) => {
-        if (err) {
-            throw err;
-        }
-    });
-};
+import { overwriteFile, removePodcastFiles, saveFile } from "../utils";
 
 const CreatePodcast = PodcastFormSchema.omit({
     id: true,
     author_id: true,
     is_active: true,
     comments_enabled: true,
-    access_token: true,
     status: true,
+    created_at: true,
+    updated_at: true,
+});
+
+const EditUser = UserFormSchema.omit({
+    id: true,
+    email: true,
+    password: true,
+    created_at: true,
+    updated_at: true,
+});
+
+const CreateEpisode = EpisodeFormSchema.omit({
+    id: true,
+    podcast_id: true,
+    is_active: true,
+    duration: true,
+    created_at: true,
+    updated_at: true,
+});
+
+const EditEpisode = EditEpisodeFormSchema.omit({
+    id: true,
+    podcast_id: true,
+    duration: true,
     created_at: true,
     updated_at: true,
 });
@@ -119,8 +120,8 @@ export async function createPodcast(state: PodcastFormState, formData: FormData)
         };
     }
 
-    await saveImage(avatar_url, podcast.id, avatar);
-    banner_url && (await saveImage(banner_url, podcast.id, banner));
+    await saveFile(avatar_url, podcast.id, avatar);
+    banner_url && (await saveFile(banner_url, podcast.id, banner));
 
     const categoriesJson = JSON.stringify(selectedCategoriesId);
     const tagsJson = JSON.stringify(selectedTagsId);
@@ -152,24 +153,85 @@ export async function createPodcast(state: PodcastFormState, formData: FormData)
     redirect(`/p/podcast/${podcast.id}`);
 }
 
-async function updateManagement(id: string, data: { is_active?: boolean; comments_enabled?: boolean }) {
-    const { is_active, comments_enabled } = data;
+export async function createEpisode(state: EpisodeFormState, formData: FormData) {
+    // checking authorization
+    const podcast_id = formData.get("podcast_id") as string;
+    const session = await getSession();
 
-    const updated_at = new Date().toISOString().split("T")[0];
+    if (!session) {
+        redirect("/");
+    }
 
-    await sql`
-        UPDATE podcasts
-        SET is_active = ${is_active}, comments_enabled = ${comments_enabled}, updated_at = ${updated_at}
-        WHERE id = ${id}
-    `;
+    if (!validate(podcast_id)) {
+        return {
+            message: "Неправильний ідентифікатор подкасту",
+        };
+    }
+
+    const podcast = await fetchPodcast(podcast_id);
+
+    if (!podcast) {
+        return {
+            message: "Неправильний ідентифікатор подкасту",
+        };
+    }
+
+    if (podcast.author_id !== session?.userId && session.role !== "admin") {
+        return {
+            message: "Немає доступу",
+        };
+    }
+
+    // validation of the form data
+    const validatedFields = CreateEpisode.safeParse({
+        title: formData.get("title"),
+        description: formData.get("description"),
+        image: formData.get("image"),
+        audio: formData.get("audio"),
+    });
+
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: "Відсутні обов'язкові поля. Створення епізоду не вдалося.",
+        };
+    }
+
+    // Getting data from validated fields
+    const { title, description, image, audio } = validatedFields.data;
+
+    // Processing audio and image data
+    const image_url = `${v4()}.${image.name.split(".").pop()}`;
+    const audio_url = `${v4()}.${audio.name.split(".").pop()}`;
+
+    // inserting row to the db
+    const result = await sql`
+            INSERT INTO episodes (podcast_id, title, description, audio_url, image_url)
+            VALUES (${podcast_id}, ${title}, ${description}, ${audio_url}, ${image_url})
+            RETURNING id
+            `;
+
+    const episode = result.rows[0];
+
+    if (!episode) {
+        return {
+            message: "Під час створення нового епізоду виникла помилка.",
+        };
+    }
+
+    await saveFile(`${episode.id}/${audio_url}`, podcast.id, audio);
+    await saveFile(`${episode.id}/${image_url}`, podcast.id, image);
+
+    revalidatePath(`/p/episode/create/${episode.id}`);
+    redirect(`/p/podcast/${podcast_id}`);
 }
 
 export async function editPodcast(state: PodcastFormState, formData: FormData) {
     const action = formData.get("action") as string;
     const id = formData.get("id") as string;
 
-    if (!id) {
-        return { message: "Недійсний ідентифікатор подкасту." };
+    if (!id || !validate(id)) {
+        return { message: "Неправильний ідентифікатор подкасту." };
     }
 
     try {
@@ -225,21 +287,16 @@ export async function editPodcast(state: PodcastFormState, formData: FormData) {
                 console.log(key, value);
                 if (key === "avatar") {
                     const filePath = `/assets/podcasts/${id}/${podcast.avatar_url}`;
-                    await overwriteImage(filePath, value);
-                    await sql`
-                        UPDATE podcasts
-                        SET updated_at = ${updated_at}
-                        WHERE id = ${id}
-                    `;
+                    await overwriteFile(filePath, value);
                 } else if (key === "banner") {
                     const filePath = `/assets/podcasts/${id}/${podcast.banner_url}`;
-                    await overwriteImage(filePath, value);
-                    await sql`
-                        UPDATE podcasts
-                        SET updated_at = ${updated_at}
-                        WHERE id = ${id}
-                    `;
+                    await overwriteFile(filePath, value);
                 }
+                await sql`
+                    UPDATE podcasts
+                    SET updated_at = ${updated_at}
+                    WHERE id = ${id}
+                `;
             }
         } else if (action === "update-classification") {
             const [podcastCategories, podcastTags, categories, tags] = await Promise.all([
@@ -345,10 +402,236 @@ export async function editPodcast(state: PodcastFormState, formData: FormData) {
     redirect(`/p/podcast/${id}`);
 }
 
+export async function editEpisode(id: string, podcast_id: string, state: EpisodeFormState, formData: FormData) {
+    // checking authorization
+    if (!validate(id))
+        return {
+            message: "Неправильний ідентифікатор епізоду",
+        };
+
+    // validation of the form data
+    const fields: Record<string, unknown> = {
+        title: formData.get("title"),
+        description: formData.get("description"),
+        is_active: (formData.get("is_active") as string) === "true",
+    };
+
+    const imageField = formData.get("image") === "null" ? null : (formData.get("image") as File);
+    if (imageField) {
+        fields.image = imageField;
+    }
+
+    const audioField = formData.get("audio") === "null" ? null : (formData.get("audio") as File);
+    if (audioField) {
+        fields.audio = audioField;
+    }
+
+    const validatedFields = EditEpisode.safeParse(fields);
+
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: "Відсутні обов'язкові поля. Створення епізоду не вдалося.",
+        };
+    }
+
+    // Getting data from validated fields
+    const { title, description, image, audio, is_active } = validatedFields.data;
+
+    const updated_at = new Date().toISOString().split("T")[0];
+
+    try {
+        // updating row in the db
+        const result = await sql`
+            UPDATE episodes
+            SET title = ${title}, description = ${description}, is_active = ${is_active}, updated_at = ${updated_at}
+            WHERE id = ${id}
+            RETURNING image_url, audio_url;
+        `;
+
+        const episode = result.rows[0];
+
+        if (!episode) {
+            return {
+                message: "Під час редагування епізоду виникла помилка.",
+            };
+        }
+
+        const episode_assets_path = `/assets/podcasts/${podcast_id}/${id}/`;
+        if (image) await overwriteFile(episode_assets_path + episode.image_url, image);
+        if (audio) await overwriteFile(episode_assets_path + episode.audio_url, audio);
+    } catch (err) {
+        console.log(err);
+        return {
+            message: "Database Error: Failed to update episode.",
+            error: err,
+        };
+    }
+
+    revalidatePath(`/p/episode/${id}/`);
+    redirect(`/p/episode/${id}/`);
+}
+
+export async function editUser(id: string, state: UserFormState, formData: FormData) {
+    if (!validate(id))
+        return {
+            message: "Неправильний ідентифікатор користувача",
+        };
+
+    const fields: Record<string, unknown> = {
+        username: formData.get("username"),
+        birthday_day: Number(formData.get("birthday_day")),
+        birthday_month: Number(formData.get("birthday_month")),
+        birthday_year: Number(formData.get("birthday_year")),
+        gender: formData.get("gender"),
+    };
+
+    const avatarField = formData.get("avatar") === "null" ? null : (formData.get("avatar") as File);
+    if (avatarField) {
+        fields.avatar = avatarField;
+    }
+
+    const bannerField = formData.get("banner") === "null" ? null : (formData.get("banner") as File);
+    if (bannerField) {
+        fields.banner = bannerField;
+    }
+
+    const roleField = formData.get("role") ? formData.get("role") : null;
+    if (roleField) {
+        fields.role = roleField;
+    }
+
+    const validatedFields = EditUser.safeParse(fields);
+    console.log(validatedFields.data);
+
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: "Відсутні обов'язкові поля. Створення епізоду не вдалося.",
+        };
+    }
+
+    const { username, gender, role, birthday_day, birthday_month, birthday_year, avatar, banner } =
+        validatedFields.data;
+
+    const updated_at = new Date().toISOString().split("T")[0];
+    const birthday_date = `${birthday_year}-${birthday_month}-${birthday_day}`;
+
+    console.log(birthday_day, birthday_month, birthday_year);
+    console.log(birthday_date);
+
+    try {
+        const result = await sql`
+            UPDATE users
+            SET 
+                username = ${username}, 
+                gender = ${gender}, 
+                birthday_date = ${birthday_date},
+                updated_at = ${updated_at}
+            WHERE id = ${id}
+            RETURNING avatar_url, banner_url;
+        `;
+
+        const user = result.rows[0];
+
+        if (!user) {
+            return {
+                message: "Під час редагування користувача виникла помилка.",
+            };
+        }
+
+        const user_assets_path = `/assets/users/${id}/`;
+        const session = await getSession();
+
+        let avatar_url;
+
+        if (avatar) {
+            avatar_url = user.avatar_url ? user.avatar_url : `${v4()}.${avatar.name.split(".").pop()}`;
+            await overwriteFile(user_assets_path + avatar_url, avatar);
+
+            if (!user.avatar_url) {
+                await sql`UPDATE users SET avatar_url = ${avatar_url} WHERE id = ${id}`;
+            }
+        }
+        if (banner) {
+            const banner_url = user.banner_url ? user.banner_url : `${v4()}.${banner.name.split(".").pop()}`;
+            await overwriteFile(user_assets_path + banner_url, banner);
+
+            if (!user.banner_url) {
+                await sql`UPDATE users SET banner_url = ${banner_url} WHERE id = ${id}`;
+            }
+        }
+        if (role) {
+            await sql`UPDATE users SET role = ${role} WHERE id = ${id}`;
+        }
+
+        if (session && session.userId === id) {
+            const res = await editSession({
+                userId: id,
+                role: role || session.role,
+                name: username,
+                avatar_url: avatar_url || session.avatar_url,
+            });
+            if (res.ok) {
+                console.log("Session updated successfully");
+            }
+        }
+    } catch (err) {
+        console.log(err);
+        return {
+            message: "Database Error: Failed to update episode.",
+            error: err,
+        };
+    }
+
+    revalidatePath(`/p/profile/${id}/`);
+    redirect(`/p/profile/${id}/`);
+}
+
+export async function deleteEpisode(id: string) {
+    try {
+        await sql`DELETE FROM episodes WHERE id = ${id}`;
+        revalidatePath(`/p/episode/${id}`);
+        return { message: "Епізод видалено." };
+    } catch (err) {
+        return {
+            message: "Database Error: Failed to delete episode.",
+            error: err,
+        };
+    }
+}
+
+export async function deletePodcast(id: string) {
+    try {
+        await Promise.all([sql`DELETE FROM podcasts WHERE id = ${id}`, removePodcastFiles(id)]);
+
+        revalidatePath(`/p/podcast/`);
+        return { message: "Подкаст видалено." };
+    } catch (err) {
+        return {
+            message: "Database Error: Failed to delete podcast.",
+            error: err,
+        };
+    }
+}
+
+export async function deleteUser(id: string) {
+    try {
+        await sql`DELETE FROM users WHERE id = ${id}`;
+        revalidatePath(`/p/profile/`);
+        return { message: "Користувача видалено." };
+    } catch (err) {
+        return {
+            message: "Database Error: Failed to delete podcast.",
+            error: err,
+        };
+    }
+}
+
 export async function addToBookmarks(options: {
     user_id: string;
     podcast_id: string;
-    list_type: "listening" | "planned" | "abandoned" | "finished" | "favorite";
+    list_type: Bookmarks["list_type"];
 }) {
     const validatedFields = AddBookmarks.safeParse({
         list_type: options.list_type,

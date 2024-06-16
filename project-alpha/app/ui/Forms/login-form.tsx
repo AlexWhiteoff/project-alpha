@@ -20,11 +20,11 @@ export default function LoginForm() {
             <div className="px-6 pb-4 pt-16 mx-auto md:w-[400px]">
                 <div className="my-4">
                     <div>
-                        <h1 className={`${lusitana.className} mb-3 text-2xl`}>Please log in to continue.</h1>
+                        <h1 className={`${lusitana.className} mb-3 text-2xl`}>Будь ласка, увійдіть, щоб продовжити.</h1>
                         <div className="my-4">
                             <div className="my-4">
                                 <label className="block text-sm font-medium text-grey-800" htmlFor="email">
-                                    Email address
+                                    Електронна адреса
                                 </label>
                                 <input
                                     className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full h-10 px-2 shadow-sm sm:text-sm border-gray-300 rounded-md"
@@ -41,7 +41,7 @@ export default function LoginForm() {
                 </div>
                 <div className="my-4">
                     <label className="block text-sm font-medium text-grey-800" htmlFor="password">
-                        Password
+                        Пароль
                     </label>
                     <div className="flex flex-col justify-center items-end mt-1">
                         <input
@@ -83,7 +83,7 @@ function LoginButton() {
 
     return (
         <Button className="mt-4 w-full" aria-disabled={pending} onClick={handleClick}>
-            {pending ? "Submitting..." : "Log in"}
+            {pending ? "Обробка..." : "Увійти"}
         </Button>
     );
 }
