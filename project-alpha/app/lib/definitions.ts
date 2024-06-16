@@ -3,8 +3,10 @@
 
 import { string, z } from "zod";
 
-const MAX_FILE_SIZE = 1024 * 1024 * 5; // 5 MB
+const MAX_IMAGE_SIZE = 1024 * 1024 * 5; // 5 MB
+const MAX_AUDIO_SIZE = 1024 * 1024 * 150; // 150 MB
 const ACCEPTED_IMAGE_MIME_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+const ACCEPTED_AUDIO_MIME_TYPES = ["audio/mp3", "audio/aac", "audio/wav", "audio/flac", "audio/ogg"];
 
 export const SignupFormSchema = z.object({
     email: z
@@ -20,7 +22,7 @@ export const SignupFormSchema = z.object({
         .regex(/[a-zA-z]/, { message: "Містити принаймні 1 літеру." })
         .regex(/[^a-zA-Z\s]/, { message: "Містить принаймні 1 цифру або спеціальний символ." })
         .trim(),
-    username: z.string().min(2, { message: "Name must be at least 2 characters." }).trim(),
+    username: z.string().min(2, { message: "Ім'я повинно містити щонайменше 8 символів." }).trim(),
     birthday_day: z
         .number()
         .gt(0, { message: "Будь ласка, введіть день своєї дати народження у вигляді числа від 1 до 31." })
@@ -45,13 +47,60 @@ export const SigninFormSchema = z.object({
     password: z.string().min(8).trim(),
 });
 
+export const UserFormSchema = z.object({
+    id: z.string(),
+    email: z.string().trim(),
+    password: z.string().trim(),
+    username: z.string().min(2, { message: "Ім'я повинно містити щонайменше 8 символів." }).trim(),
+    avatar: z
+        .any()
+        .refine((file) => file?.size <= MAX_IMAGE_SIZE, `Максимальний розмір файлу - 5 МБ.`)
+        .refine(
+            (file) => ACCEPTED_IMAGE_MIME_TYPES.includes(file?.type),
+            "Підтримуються лише формати .jpg, .jpeg, .png та .gif."
+        )
+        .optional(),
+    banner: z
+        .any()
+        .refine((file) => file === null || file?.size <= MAX_IMAGE_SIZE, `Максимальний розмір файлу - 5 МБ.`)
+        .refine(
+            (file) => file === null || ACCEPTED_IMAGE_MIME_TYPES.includes(file?.type),
+            "Підтримуються лише формати .jpg, .jpeg, .png та .gif."
+        )
+        .optional(),
+    birthday_day: z
+        .number()
+        .gt(0, { message: "Будь ласка, введіть день дати народження у вигляді числа від 1 до 31." })
+        .lt(32, { message: "Будь ласка, введіть день дати народження у вигляді числа від 1 до 31." }),
+    birthday_month: z
+        .number({ message: "Оберіть місяць народження." })
+        .gt(0, { message: "Оберіть місяць народження." })
+        .lt(13, { message: "Оберіть місяць народження." }),
+    birthday_year: z
+        .number()
+        .gt(1900, {
+            message: "Будь ласка, введіть рік дати народження у форматі чотирьох цифр (наприклад, 1990).",
+        })
+        .lte(new Date().getFullYear() - 16, { message: "Користувач занадто молодий, щоб мати обліковий запис." }),
+    gender: z.enum(["male", "female", "non_binary", "something_else", "prefer_not_to_say", "other"], {
+        message: "Оберіть стать.",
+    }),
+    role: z
+        .enum(["admin", "content_creator", "user"], {
+            message: "Оберіть роль.",
+        })
+        .optional(),
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+
 export const PodcastFormSchema = z.object({
     id: z.string(),
-    title: z.string().min(2, { message: "Ім'я має містити щонайменше 2 символи." }).trim(),
+    title: z.string().min(2, { message: "Назва має містити щонайменше 2 символи." }).trim(),
     description: z.string().min(2, { message: "Опис має містити щонайменше 2 символи." }).trim(),
     avatar: z
         .any()
-        .refine((file) => file?.size <= MAX_FILE_SIZE, `Максимальний розмір зображення - 5 МБ.`)
+        .refine((file) => file?.size <= MAX_IMAGE_SIZE, `Максимальний розмір файлу - 5 МБ.`)
 
         .refine(
             (file) => ACCEPTED_IMAGE_MIME_TYPES.includes(file?.type),
@@ -60,7 +109,7 @@ export const PodcastFormSchema = z.object({
     banner: z
         .any()
         .nullable()
-        .refine((file) => file === null || file?.size <= MAX_FILE_SIZE, `Максимальний розмір зображення - 5 МБ.`)
+        .refine((file) => file === null || file?.size <= MAX_IMAGE_SIZE, `Максимальний розмір файлу - 5 МБ.`)
         .refine(
             (file) => file === null || ACCEPTED_IMAGE_MIME_TYPES.includes(file?.type),
             "Підтримуються лише формати .jpg, .jpeg, .png та .gif."
@@ -68,11 +117,64 @@ export const PodcastFormSchema = z.object({
     author_id: z.string(),
     is_active: z.boolean(),
     comments_enabled: z.boolean(),
-    access_token: z.string(),
     status: z.enum(["pending", "announced", "ongoing", "published", "discontinued", "archived"], {
         message: "Оберіть статус.",
     }),
     age_rating: z.enum(["0", "6+", "12+", "16+", "18+"], { message: "Оберіть вікову категорію." }),
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+
+export const EpisodeFormSchema = z.object({
+    id: z.string(),
+    podcast_id: z.string(),
+    title: z.string().min(2, { message: "Назва має містити щонайменше 2 символи." }).trim(),
+    description: z.string().min(2, { message: "Опис має містити щонайменше 2 символи." }).trim(),
+    audio: z
+        .any()
+        .refine((file) => file === null || file?.size <= MAX_AUDIO_SIZE, `Максимальний розмір файлу - 150 МБ.`)
+        .refine(
+            (file) => file === null || ACCEPTED_AUDIO_MIME_TYPES.includes(file?.type),
+            "Підтримуються лише формати .mp3, .aac, .wav, .flac та .ogg."
+        ),
+    image: z
+        .any()
+        .refine((file) => file?.size <= MAX_IMAGE_SIZE, `Максимальний розмір файлу - 5 МБ.`)
+        .refine(
+            (file) => ACCEPTED_IMAGE_MIME_TYPES.includes(file?.type),
+            "Підтримуються лише формати .jpg, .jpeg, .png та .gif."
+        ),
+    duration: z.number(),
+    is_active: z.boolean(),
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+
+export const EditEpisodeFormSchema = z.object({
+    id: z.string(),
+    podcast_id: z.string(),
+    title: z.string().min(2, { message: "Назва має містити щонайменше 2 символи." }).trim(),
+    description: z.string().min(2, { message: "Опис має містити щонайменше 2 символи." }).trim(),
+    audio: z
+        .any()
+        .nullable()
+        .refine((file) => file === null || file?.size <= MAX_AUDIO_SIZE, `Максимальний розмір файлу - 150 МБ.`)
+        .refine(
+            (file) => file === null || ACCEPTED_AUDIO_MIME_TYPES.includes(file?.type),
+            "Підтримуються лише формати .mp3, .aac, .wav, .flac та .ogg."
+        )
+        .optional(),
+    image: z
+        .any()
+        .nullable()
+        .refine((file) => file?.size <= MAX_IMAGE_SIZE, `Максимальний розмір файлу - 5 МБ.`)
+        .refine(
+            (file) => ACCEPTED_IMAGE_MIME_TYPES.includes(file?.type),
+            "Підтримуються лише формати .jpg, .jpeg, .png та .gif."
+        )
+        .optional(),
+    duration: z.number(),
+    is_active: z.boolean(),
     created_at: z.string(),
     updated_at: z.string(),
 });
@@ -101,16 +203,31 @@ export type PodcastFormState =
       }
     | undefined;
 
+export type EpisodeFormState =
+    | {
+          errors?: {
+              title?: string[];
+              description?: string[];
+              audio?: string[];
+              image?: string[];
+          };
+          message?: string;
+      }
+    | undefined;
+
 export type UserFormState =
     | {
           errors?: {
               email?: string[];
               password?: string[];
               username?: string[];
+              avatar?: string[];
+              banner?: string[];
               birthday_day?: string[];
               birthday_month?: string[];
               birthday_year?: string[];
               gender?: string[];
+              role?: string[];
           };
           message?: string;
       }
@@ -148,7 +265,6 @@ export type Podcast = {
     author_id: string;
     is_active: boolean;
     comments_enabled: boolean;
-    access_token: string;
     status: "pending" | "announced" | "ongoing" | "published" | "discontinued";
     age_rating: "0" | "6+" | "12+" | "16+" | "18+";
     created_at: string;
@@ -162,8 +278,6 @@ export type Episode = {
     description: string;
     audio_url: string;
     image_url: string;
-    duration: number;
-    release_date: string;
     is_active: boolean;
     created_at: string;
     updated_at: string;
@@ -176,9 +290,8 @@ export type EpisodeTable = {
     description: string;
     audio_url: string;
     image_url: string;
-    duration: number;
-    release_date: string;
     is_active: boolean;
+    created_at: string;
 };
 
 export type Categories = {
@@ -199,20 +312,53 @@ export type Bookmarks = {
     updated_at: string;
 };
 
-export type Ratings = {
-    rating_id: string;
-    user_id: string;
-    podcast_id: string;
-    rating: number;
+export interface ExtendedPodcast extends Podcast {
+    episode_count: number;
+    author_name: string;
+}
+
+export interface ExtendedEpisode extends Episode {
+    author_name?: string;
+    podcast_title: string;
+}
+
+export type PodcastsTableType = {
+    id: string;
+    title: string;
+    avatar_url: string;
+    author_id: string;
+    author_name: string;
+    is_active: boolean;
+    status: "pending" | "announced" | "ongoing" | "published" | "discontinued";
+    total_episodes: number;
     created_at: string;
+    updated_at: string;
 };
 
-export type Comments = {
+export type EpisodeTableType = {
     id: string;
-    user_id: string;
     podcast_id: string;
-    parent_comment_id?: string;
-    content: string;
+    author_id: string;
+    title: string;
+    description: string;
+    image_url: string;
+    is_active: boolean;
+    author_name: string;
+    podcast_title: string;
+    podcast_is_active: boolean;
+    status: string;
+    created_at: string;
+    updated_at: string;
+};
+
+export type UserTableType = {
+    id: string;
+    email: string;
+    username: string;
+    birthday_date: string;
+    gender: "male" | "female" | "non_binary" | "something_else" | "prefer_not_to_say" | "other";
+    avatar_url: string;
+    role: "admin" | "content_creator" | "user";
     created_at: string;
     updated_at: string;
 };

@@ -57,7 +57,6 @@ async function seedPodcasts(client) {
                 author_id UUID,
                 is_active BOOLEAN DEFAULT TRUE,
                 comments_enabled BOOLEAN DEFAULT TRUE,
-                access_token UUID DEFAULT uuid_generate_v4(),
                 status VARCHAR(20) DEFAULT 'pending',
                 age_rating VARCHAR(20) DEFAULT NULL,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -188,11 +187,7 @@ async function seedEpisodes(client) {
                 description TEXT,
                 audio_url TEXT NOT NULL,
                 image_url TEXT NOT NULL,
-                duration INT NOT NULL,
-                release_date DATE NOT NULL,
-                episode_number INT,
                 is_active BOOLEAN DEFAULT TRUE,
-                access_key UUID DEFAULT uuid_generate_v4(),
                 created_at TIMESTAMP DEFAULT NOW(),
                 updated_at TIMESTAMP DEFAULT NOW(),
                 FOREIGN KEY (podcast_id) REFERENCES podcasts(id) ON DELETE CASCADE
@@ -281,7 +276,6 @@ async function seedRatings(client) {
                 user_id UUID NOT NULL,
                 podcast_id UUID NOT NULL,
                 rating INT NOT NULL, 
-                content TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT NOW(),
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
                 FOREIGN KEY (podcast_id) REFERENCES podcasts(id) ON DELETE CASCADE

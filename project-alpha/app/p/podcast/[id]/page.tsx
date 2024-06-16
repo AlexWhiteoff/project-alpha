@@ -1,16 +1,15 @@
 import { getSession } from "@/app/lib/actions/session";
 import {
     fetchPodcast,
+    fetchPodcastEpisodes,
     getPodcastCategories,
     getPodcastTags,
     getUserBookmarkByPodcastId,
     getUserById,
 } from "@/app/lib/data";
-import { Episode } from "@/app/lib/definitions";
-import EpisodeList from "@/app/ui/Podcast/EpisodeList";
+import EpisodeList from "@/app/ui/Episodes/EpisodeList";
 import { AddToBookmarkButton } from "@/app/ui/addToBookmarkButton";
-import usePlayer from "@/app/utils/hooks/usePlayer";
-import { PlusIcon, SignalIcon } from "@heroicons/react/24/outline";
+import { ListenPodcastButton } from "@/app/ui/buttons";
 import { Cog6ToothIcon } from "@heroicons/react/24/solid";
 import { format } from "date-fns";
 import { Metadata, ResolvingMetadata } from "next";
@@ -32,7 +31,7 @@ export async function generateMetadata(
             title: "Not Found",
         };
 
-    const author = (await getUserById(podcast.author_id)).username;
+    const author = (await getUserById(podcast.author_id))?.username;
 
     // optionally access and extend (rather than replace) parent metadata
     const previousImages = (await parent).openGraph?.images || [];
@@ -45,18 +44,19 @@ export async function generateMetadata(
 export default async function Page({ params }: { params: { id: string } }) {
     const id = params.id;
     const [podcast] = await Promise.all([fetchPodcast(id)]);
-    const [categories, tags, author, user] = await Promise.all([
-        getPodcastCategories(podcast.id),
-        getPodcastTags(podcast.id),
-        getUserById(podcast.author_id),
-        getSession(),
-    ]);
-    const bookmarkList = user && (await getUserBookmarkByPodcastId(podcast.id, user.userId));
-    const episodes: Episode[] = [];
 
     if (!podcast) {
         notFound();
     }
+
+    const [categories, tags, author, user, episodes] = await Promise.all([
+        getPodcastCategories(podcast.id),
+        getPodcastTags(podcast.id),
+        getUserById(podcast.author_id),
+        getSession(),
+        fetchPodcastEpisodes(podcast.id),
+    ]);
+    const bookmarkList = user && (await getUserBookmarkByPodcastId(podcast.id, user.userId));
 
     const podcastStatusList = [
         { label: "Очікує на перевірку", value: "pending" },
@@ -69,7 +69,11 @@ export default async function Page({ params }: { params: { id: string } }) {
     return (
         <main className="flex min-h-full justify-center">
             <div className="flex flex-col gap-4 max-w-[1168px] w-full md:rounded-lg overflow-y-auto">
-                <div className="flex items-center justify-center w-full h-[200px] lg:h-[500px]">
+                <div
+                    className={`flex items-center justify-center w-full ${
+                        podcast.banner_url ? "h-[200px] lg:h-[500px]" : "h-40"
+                    }`}
+                >
                     <Image
                         src={`/assets/podcasts/${id}/${podcast.banner_url}`}
                         alt="{podcast banner image}"
@@ -120,16 +124,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                                     bookmarkList={bookmarkList}
                                 />
                             )}
-                            <button
-                                type="button"
-                                className="flex justify-center items-center gap-2 border border-neutral-500 bg-blue-500 hover:bg-blue-400 rounded-md py-1 w-full md:w-48 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600 aria-disabled:opacity-50"
-                                aria-disabled={episodes.length !== 0 ? false : true}
-                            >
-                                <SignalIcon className="w-5" />
-                                <span className="text-nowrap">
-                                    {episodes.length !== 0 ? "Слухати" : "Без епізодів"}
-                                </span>
-                            </button>
+                            <ListenPodcastButton episodes={episodes} />
                             {(podcast.author_id === user?.userId || user?.role === "admin") && (
                                 <div className="block md:hidden">
                                     <Link
@@ -145,17 +140,19 @@ export default async function Page({ params }: { params: { id: string } }) {
                 </div>
                 <div className="flex flex-col lg:flex-row gap-4">
                     <div className="flex flex-col gap-4 w-full h-fit lg:w-1/3 py-4 px-4 lg:bg-neutral-800 rounded-lg">
-                        <div className="flex flex-col gap-1">
-                            <p className="text-bold text-sm text-neutral-300">Автор</p>
-                            <div className="w-full">
-                                <Link
-                                    href={`/p/profile/${author.id}/`}
-                                    className="transition-all flex items-center px-2 py-1 rounded-md hover:bg-neutral-700"
-                                >
-                                    <span className="text-md text-nowrap">{author.username}</span>
-                                </Link>
+                        {author && (
+                            <div className="flex flex-col gap-1">
+                                <p className="text-bold text-sm text-neutral-300">Автор</p>
+                                <div className="w-full">
+                                    <Link
+                                        href={`/p/profile/${author.id}/`}
+                                        className="transition-all flex items-center px-2 py-1 rounded-md hover:bg-neutral-700"
+                                    >
+                                        <span className="text-md text-nowrap">{author.username}</span>
+                                    </Link>
+                                </div>
                             </div>
-                        </div>
+                        )}
                         <div className="flex flex-col gap-1">
                             <p className="text-bold text-sm text-neutral-300">Статус</p>
                             <div className="w-full">
@@ -196,7 +193,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                                 {categories.map((option) => (
                                     <Link
                                         key={option.id}
-                                        href={`/c/${option.id}`}
+                                        href={`/p/catalog?categories=${option.name}`}
                                         className="transition-all flex items-center gap-2 border border-blue-600 px-2 py-1 rounded-md hover:bg-neutral-700"
                                     >
                                         <span className="text-sm text-nowrap">{option.name}</span>
@@ -210,7 +207,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                                 {tags.map((option) => (
                                     <Link
                                         key={option.id}
-                                        href={`/c/${option.id}`}
+                                        href={`/p/catalog?tags=${option.name}`}
                                         className="transition-all flex items-center gap-2 border border-blue-600 px-2 py-1 rounded-md hover:bg-neutral-700"
                                     >
                                         <span className="text-sm text-nowrap">{option.name}</span>
@@ -221,7 +218,13 @@ export default async function Page({ params }: { params: { id: string } }) {
                         <div className="flex flex-col xl:flex-row-reverse gap-6">
                             <div className="flex flex-col gap-2">
                                 <p className="text-bold text-sm text-neutral-300">Епізоди</p>
-                                {episodes.length !== 0 ? <div></div> : <div>Тут ще нема епізодів!</div>}
+                                <div className="flex items-center flex-wrap gap-2 justify-start w-full">
+                                    {episodes.length !== 0 ? (
+                                        <EpisodeList episodes={episodes} />
+                                    ) : (
+                                        <div>Тут ще нема епізодів!</div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

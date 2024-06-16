@@ -1,19 +1,17 @@
 import { createContext, Dispatch, useContext } from "react";
-import { Episode } from "@/app/lib/definitions";
+import { ExtendedEpisode } from "@/app/lib/definitions";
 
-// Оголосіть типи для стану та дій
 export interface PodcastState {
-    currentEpisode: Episode | null;
+    episode: ExtendedEpisode | null;
 }
 
-export type PodcastAction = { type: "SET_EPISODE"; payload: Episode } | { type: "CLEAR_EPISODE" };
+export type PodcastAction = { type: "SET_EPISODE"; payload: ExtendedEpisode } | { type: "CLEAR_EPISODE" };
 
 interface PodcastContextProps {
     state: PodcastState;
     dispatch: Dispatch<PodcastAction>;
 }
 
-// Створіть контекст
 const PodcastContext = createContext<PodcastContextProps | undefined>(undefined);
 
 export const usePodcastContext = () => {

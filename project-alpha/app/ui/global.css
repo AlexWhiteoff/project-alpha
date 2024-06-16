@@ -33,24 +33,38 @@ option {
     .text-balance {
         text-wrap: balance;
     }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+    .vertical {
+        appearance: slider-vertical;
+        writing-mode: vertical-lr;
+        direction: rtl;
+    }
 }
 
 ::-webkit-scrollbar {
-    width: 10px;
+    width: 5px;
 }
- 
+
 /* Track */
 ::-webkit-scrollbar-track {
     background: unset;
     border-radius: 5px;
 }
- 
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: rgb(var(--background-start-rgb));
+    background: rgba(85, 85, 85, 0.3);
     border-radius: 5px;
 }
- 
+
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
