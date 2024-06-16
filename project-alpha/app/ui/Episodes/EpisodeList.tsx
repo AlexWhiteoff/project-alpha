@@ -1,41 +1,108 @@
-import { Episode } from "@/app/lib/definitions";
-import usePlayer from "@/app/utils/hooks/usePlayer";
-import { PlayIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
+import { UpdateEpisode, DeleteEpisode, PlayButton } from "@/app/ui/buttons";
 import Link from "next/link";
+import { PlayIcon } from "@heroicons/react/24/solid";
+import { EpisodeTable, ExtendedEpisode } from "@/app/lib/definitions";
+import { formatDateToLocal } from "@/app/ui/utils";
+import clsx from "clsx";
+import styles from "@/app/ui/Styles/text.module.css";
 
-const EpisodeList = ({ podcastId, episodes }: { podcastId: string; episodes: Episode[] }) => {
+const EpisodeList = ({ episodes }: { episodes: ExtendedEpisode[] }) => {
     return (
-        <div className="flex flex-wrap flex-col gap-4 divide-y divide-gray-300">
-            {episodes.map((episode: Episode) => (
-                <Link
-                    className="relative hover:bg-gray-300 p-2 flex flex-row items-center gap-4 z-0"
-                    key={episode.id}
-                    href={"/episode/" + episode.id}
-                >
-                    <div>
-                        <div className="w-[100px] h-[100px] rounded overflow-hidden">
-                            <Image
-                                alt={episode.title}
-                                src={`/assets/podcasts/${podcastId}/${episode.image_url}`}
-                                width={100}
-                                height={100}
-                            />
+        <div className="flow-root">
+            <div className="inline-block min-w-full align-middle">
+                <div className="max-h-dvh rounded-lg overflow-y-auto">
+                    {episodes.length > 0 ? (
+                        episodes?.map((episode) => (
+                            <div
+                                className="transition-colors md:hover:bg-neutral-700 py-2 flex flex-row rounded-lg overflow-hidden items-center gap-4"
+                                key={episode.id}
+                            >
+                                <div className="flex md:hidden flex-col items-center gap-4 py-2">
+                                    <Link
+                                        href={"/p/episode/" + episode.id}
+                                        className="flex w-full shrink-0 gap-3 items-center"
+                                    >
+                                        <div className="flex w-20 shrink-0 rounded-lg overflow-hidden">
+                                            <Image
+                                                alt={episode.title}
+                                                src={`/assets/podcasts/${episode.podcast_id}/${episode.id}/${episode.image_url}`}
+                                                width={250}
+                                                height={250}
+                                                draggable={false}
+                                            />
+                                        </div>
+                                        <div className="text-neutral-100 font-bold">{episode.title}</div>
+                                    </Link>
+                                    <div className="flex flex-col gap-1">
+                                        <div
+                                            className={clsx(
+                                                "text-neutral-300 text-sm overflow-hidden",
+                                                styles.lineClamp
+                                            )}
+                                        >
+                                            {episode.description}
+                                        </div>
+                                        <div className="text-sm text-white font-bold my-1">
+                                            {formatDateToLocal(episode.created_at)}
+                                        </div>
+                                        <div className="flex gap-3 items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <UpdateEpisode id={episode.id} />
+                                                <DeleteEpisode id={episode.id} />
+                                            </div>
+                                            <button className="transition-all text-neutral-300 relative p-3 flex justify-center items-center rounded-full hover:bg-neutral-800 hover:text-neutral-100">
+                                                <PlayIcon className="w-6" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="hidden md:flex flex-row items-center gap-4 transition-colors hover:bg-neutral-700 p-2">
+                                    <Link
+                                        href={"/p/episode/" + episode.id}
+                                        className="flex w-32 shrink-0 rounded-lg overflow-hidden"
+                                    >
+                                        <Image
+                                            alt={episode.title}
+                                            src={`/assets/podcasts/${episode.podcast_id}/${episode.id}/${episode.image_url}`}
+                                            width={250}
+                                            height={250}
+                                            draggable={false}
+                                        />
+                                    </Link>
+                                    <div className="flex flex-col gap-1">
+                                        <Link href={"/p/episode/" + episode.id} className="text-neutral-100 font-bold">
+                                            {episode.title}
+                                        </Link>
+                                        <div
+                                            className={clsx(
+                                                "text-neutral-300 text-md overflow-hidden",
+                                                styles.lineClamp
+                                            )}
+                                        >
+                                            {episode.description}
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <div className="text-sm text-white font-bold my-1">
+                                                {formatDateToLocal(episode.created_at)}
+                                            </div>
+                                            <div className="flex gap-3 items-center">
+                                                <UpdateEpisode id={episode.id} />
+                                                <DeleteEpisode id={episode.id} />
+                                                <PlayButton episode={episode} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="w-full text-center">
+                            <p className="text-neutral-300 font-medium">Епізоди не знайдено</p>
                         </div>
-                    </div>
-                    <div>
-                        <div className="text-gray-950 font-bold">{episode.title}</div>
-                        <div className="text-gray-950 h-12 text-ellipsis overflow-hidden">{episode.description}</div>
-                        <div className="text-sm text-gray-950 font-bold">{episode.release_date}</div>
-                        <div>
-                            <div></div>
-                            <button className="relative w-8 h-8 flex justify-center items-center rounded-full z-10">
-                                <PlayIcon className="w-8 h-8 hover:text-gray-50 text-gray-950" />
-                            </button>
-                        </div>
-                    </div>
-                </Link>
-            ))}
+                    )}
+                </div>
+            </div>
         </div>
     );
 };

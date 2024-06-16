@@ -1,15 +1,12 @@
 "use server";
 
-import { SignupFormSchema, UserFormState, SigninFormSchema, SessionPayload } from "@/app/lib/definitions";
+import { SignupFormSchema, UserFormState, SigninFormSchema } from "@/app/lib/definitions";
 import { sql } from "@vercel/postgres";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { AuthError } from "next-auth";
 import bcrypt from "bcrypt";
 import { createSession, deleteSession } from "@/app/lib/actions/session";
-import { getUserByEmail } from "../data";
-import { error } from "console";
-// import { signIn } from "@/auth";
+import { getUserByEmail } from "@/app/lib/data";
 
 export async function signUp(state: UserFormState, formData: FormData) {
     const validatedFields = SignupFormSchema.safeParse({

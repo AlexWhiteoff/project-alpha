@@ -5,12 +5,12 @@ export function podcastReducer(state: PodcastState, action: PodcastAction): Podc
         case "SET_EPISODE":
             return {
                 ...state,
-                currentEpisode: action.payload,
+                episode: action.payload,
             };
         case "CLEAR_EPISODE":
             return {
                 ...state,
-                currentEpisode: null,
+                episode: null,
             };
         default:
             return state;

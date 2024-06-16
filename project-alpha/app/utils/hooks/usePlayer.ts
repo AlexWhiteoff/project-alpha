@@ -2,31 +2,66 @@
 
 import { useAudioRef } from "@/app/utils/context/audioContext";
 import { usePodcastContext } from "@/app/utils/context/podcastContext";
-import { Episode } from "@/app/lib/definitions";
-import { useEffect, useRef, useState } from "react";
+import { ExtendedEpisode } from "@/app/lib/definitions";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 interface UsePlayer {
     isPlaying: boolean;
+    isLooping: boolean;
     playAudio: () => void;
     pauseAudio: () => void;
-    setEpisode: (episode: Episode) => void;
+    loopAudio: () => void;
+    changeVolume: (volume: number) => void;
+    skipForward: () => void;
+    skipBackward: () => void;
+    setEpisode: (episode: ExtendedEpisode) => void;
 }
 
 const usePlayer = (): UsePlayer => {
     const { audioRef } = useAudioRef();
     const [isPlaying, setIsPlaying] = useState(false);
+    const [isLooping, setIsLooping] = useState(false);
     const { state, dispatch } = usePodcastContext();
-    const currentEpisode = state.currentEpisode;
+    const episode = state.episode;
 
-    const playAudio = () => {
+    const playAudio = useCallback(() => {
         audioRef.current?.play();
         setIsPlaying(true);
-    };
-    const pauseAudio = () => {
+    }, [audioRef]);
+
+    const pauseAudio = useCallback(() => {
         audioRef.current?.pause();
         setIsPlaying(false);
-    };
+    }, [audioRef]);
+
+    const loopAudio = useCallback(() => {
+        if (audioRef.current) {
+            audioRef.current.loop = !audioRef.current.loop;
+            setIsLooping(audioRef.current.loop);
+        }
+    }, [audioRef]);
+
+    const changeVolume = useCallback(
+        (volume: number) => {
+            if (audioRef.current) {
+                audioRef.current.volume = volume;
+            }
+        },
+        [audioRef]
+    );
+
+    const skipForward = useCallback(() => {
+        if (audioRef.current) {
+            audioRef.current.currentTime += 15;
+        }
+    }, [audioRef]);
+
+    const skipBackward = useCallback(() => {
+        if (audioRef.current) {
+            audioRef.current.currentTime -= 15;
+        }
+    }, [audioRef]);
 
     useEffect(() => {
         const handleEnded = () => {
@@ -42,22 +77,30 @@ const usePlayer = (): UsePlayer => {
     }, [audioRef]);
 
     useEffect(() => {
-        if (currentEpisode && audioRef.current) {
-            const src = baseURL + "/" + currentEpisode.src;
-            console.log(src);
+        if (episode && audioRef.current) {
+            const src = `/assets/podcasts/${episode.podcast_id}/${episode.id}/${episode.audio_url}`;
             audioRef.current.src = src;
+            playAudio();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentEpisode]);
+    }, [episode]);
 
-    const setEpisode = (episode: Episode) => {
-        dispatch({ type: "SET_EPISODE", payload: episode });
-    };
+    const setEpisode = useCallback(
+        (episode: ExtendedEpisode) => {
+            dispatch({ type: "SET_EPISODE", payload: episode });
+        },
+        [dispatch]
+    );
 
     return {
         isPlaying,
+        isLooping,
         playAudio,
         pauseAudio,
+        loopAudio,
+        changeVolume,
+        skipForward,
+        skipBackward,
         setEpisode,
     };
 };

@@ -45,6 +45,23 @@ export async function updateSession(req: NextRequest) {
     return res;
 }
 
+export async function editSession({ userId, role, name, avatar_url }: SessionPayload) {
+    const payload = await encrypt({ userId, role, name, avatar_url });
+
+    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const res = NextResponse.next();
+
+    res.cookies.set("session", payload, {
+        httpOnly: true,
+        secure: true,
+        path: "/",
+        sameSite: "lax",
+        expires: expires,
+    });
+
+    return res;
+}
+
 export async function deleteSession() {
     await cookies().delete("session");
 }
