@@ -1,0 +1,24 @@
+.formList {
+    list-style: none; /* Видаляє стандартні маркери */
+    padding: 0;
+}
+
+.formList li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.formList li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid;
+    border-color: white;
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Categories, Podcast, Tags } from "@/app/lib/definitions";
+import { Categories, EpisodeTable, Podcast, Tags } from "@/app/lib/definitions";
 import Link from "next/link";
 import {
     DocumentTextIcon as OutlineDocumentTextIcon,
@@ -21,10 +21,10 @@ import {
 } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import EpisodesTab from "../Episodes/settings-episode-tab";
-import MainInfoTab from "../Episodes/update-form/mainInfoTab";
-import MediaTab from "../Episodes/update-form/mediaTab";
-import ClassificationTab from "../Episodes/update-form/classificationTab";
-import ManagementTab from "../Episodes/update-form/managementTab";
+import MainInfoTab from "./update-form/mainInfoTab";
+import MediaTab from "./update-form/mediaTab";
+import ClassificationTab from "./update-form/classificationTab";
+import ManagementTab from "./update-form/managementTab";
 
 interface PodcastFormProps {
     user_role: "admin" | "content_creator" | "user";
@@ -33,6 +33,7 @@ interface PodcastFormProps {
     podcastTags: Tags[];
     categories: Categories[];
     tags: Tags[];
+    episodes: EpisodeTable[];
 }
 
 const tabs = [
@@ -70,14 +71,15 @@ export default function PodcastEditForm({
     podcastTags,
     categories,
     tags,
+    episodes,
 }: PodcastFormProps) {
     const [activeTab, setActiveTab] = useState(0);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
         <>
-            <div className="flex flex-col gap-4 max-w-[1168px] w-full overflow-y-auto md:p-4">
-                <div className="flex items-center justify-between w-full gap-6 bg-neutral-800 md:rounded-lg px-4 py-2">
+            <div className="relative flex flex-col md:gap-4 max-w-[1168px] w-full overflow-y-auto md:p-4">
+                <div className="sticky top-0 flex items-center justify-between w-full gap-6 bg-neutral-800 md:rounded-lg px-4 py-2">
                     <Link
                         href={`/p/podcast/${podcast.id}`}
                         className="transition-colors p-2 rounded-full hover:bg-neutral-700"
@@ -93,10 +95,10 @@ export default function PodcastEditForm({
                         <Bars3Icon className="w-6" />
                     </button>
                 </div>
-                <div className="flex flex-col lg:flex-row gap-4 px-6 md:px-4">
+                <div className="flex flex-col lg:flex-row gap-4">
                     <div
                         className={clsx(
-                            "md:flex transition-all flex-col shrink-0 gap-2 md:w-full h-fit lg:w-1/4 py-4 lg:bg-neutral-800 rounded-lg overflow-y-hidden",
+                            "md:flex transition-all flex-col shrink-0 gap-2 mx-6 md:mx-0 md:w-full h-fit lg:w-1/4 py-4 lg:bg-neutral-800 rounded-b-lg overflow-y-hidden",
                             isMenuOpen ? "flex h-fit bg-neutral-800" : "hidden h-0"
                         )}
                     >
@@ -133,7 +135,7 @@ export default function PodcastEditForm({
                             />
                         )}
                         {activeTab === 3 && <ManagementTab podcast={podcast} user_role={user_role} />}
-                        {activeTab === 4 && <EpisodesTab podcastId={podcast.id} />}
+                        {activeTab === 4 && <EpisodesTab podcastId={podcast.id} episodes={episodes} />}
                     </div>
                 </div>
             </div>

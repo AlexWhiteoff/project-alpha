@@ -17,23 +17,23 @@ import {
 } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import UserProfile from "@/app/ui/Aside/User";
-import styles from "@/app/ui/animation.module.css";
+import styles from "@/app/ui/styles/animation.module.css";
 
 const links = [
     {
-        name: "Home",
+        name: "Головна",
         href: "/p",
         iconOutline: outlineHomeIcon,
         iconSolid: solidHomeIcon,
     },
     {
-        name: "Catalog",
+        name: "Каталог",
         href: "/p/catalog",
         iconOutline: outlineSquare3Stack3DIcon,
         iconSolid: solidSquare3Stack3DIcon,
     },
     {
-        name: "Bookmarks",
+        name: "Закладки",
         href: "/p/bookmarks",
         iconOutline: outlineBookmarkIcon,
         iconSolid: solidBookmarkIcon,

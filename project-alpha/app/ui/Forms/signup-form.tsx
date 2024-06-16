@@ -7,48 +7,48 @@ import { signUp } from "@/app/lib/actions/auth";
 import { ChevronLeftIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
-import styles from "@/app/ui/form.module.css";
+import styles from "@/app/ui/Styles/form.module.css";
 
 const genders = [
     {
-        name: "Male",
+        name: "Чоловіча",
         value: "male",
     },
     {
-        name: "Female",
+        name: "Жіноча",
         value: "female",
     },
     {
-        name: "Non-binary",
+        name: "Небінарна особа",
         value: "non_binary",
     },
     {
-        name: "Something else",
+        name: "Щось інше",
         value: "something_else",
     },
     {
-        name: "Prefer not to say",
+        name: "Віддаю перевагу не називати",
         value: "prefer_not_to_say",
     },
     {
-        name: "Other",
+        name: "Інші",
         value: "other",
     },
 ];
 
 const months = [
-    { name: "January", value: 1 },
-    { name: "February", value: 2 },
-    { name: "March", value: 3 },
-    { name: "April", value: 4 },
-    { name: "May", value: 5 },
-    { name: "June", value: 6 },
-    { name: "July", value: 7 },
-    { name: "August", value: 8 },
-    { name: "September", value: 9 },
-    { name: "October", value: 10 },
-    { name: "November", value: 11 },
-    { name: "December", value: 12 },
+    { name: "Січень", value: 1 },
+    { name: "Лютий", value: 2 },
+    { name: "Березень", value: 3 },
+    { name: "Квітень", value: 4 },
+    { name: "Травень", value: 5 },
+    { name: "Червень", value: 6 },
+    { name: "Липень", value: 7 },
+    { name: "Серпень", value: 8 },
+    { name: "Вересень", value: 9 },
+    { name: "Жовтень", value: 10 },
+    { name: "Листопад", value: 11 },
+    { name: "Грудень", value: 12 },
 ];
 
 const PasswordBlock = ({
@@ -101,7 +101,7 @@ const PasswordBlock = ({
         <div>
             <div className="my-4">
                 <label className="block text-sm font-medium text-grey-800" htmlFor="password">
-                    Password
+                    Пароль
                 </label>
                 <div className="flex flex-col justify-center items-end mt-1">
                     <input
@@ -124,7 +124,7 @@ const PasswordBlock = ({
                 </div>
             </div>
             <div className="text-sm">
-                <span className="font-bold">Your password must contain at least:</span>
+                <span className="font-bold">Ваш пароль повинен містити:</span>
                 <ul className={styles.formList + " ml-5"}>
                     <li
                         className={clsx({
@@ -132,7 +132,7 @@ const PasswordBlock = ({
                             "text-green-500 before:!border-green-500": isPasswordValid.length,
                         })}
                     >
-                        8 characters
+                        8 символів
                     </li>
                     <li
                         className={clsx({
@@ -140,7 +140,7 @@ const PasswordBlock = ({
                             "text-green-500 before:!border-green-500": isPasswordValid.letter,
                         })}
                     >
-                        1 letter
+                        1 літеру
                     </li>
                     <li
                         className={clsx({
@@ -149,12 +149,12 @@ const PasswordBlock = ({
                             "text-green-500 before:!border-green-500": isPasswordValid.numberOrSpecialChar,
                         })}
                     >
-                        1 number or special character
+                        1 число або спеціальний символ
                     </li>
                 </ul>
             </div>
             <Button type="button" onClick={() => handleButtonClick()} className="w-full mt-8 text-center">
-                Next Step
+                Наступний крок
             </Button>
         </div>
     );
@@ -183,7 +183,7 @@ const EmailBlock = ({
 
     const handleButtonClick = () => {
         if (email.length === 0) {
-            setEmailError({ status: true, message: "Please enter a valid email address." });
+            setEmailError({ status: true, message: "Будь ласка, введіть дійсну електронну адресу." });
             return 0;
         }
 
@@ -194,7 +194,7 @@ const EmailBlock = ({
             setIsFormValid(false);
             setEmailError({
                 status: true,
-                message: "This email is invalid. Make sure it's written like example@email.com.",
+                message: "Ця електронна адреса недійсна. Переконайтеся, що вона написана в форматі: example@email.com.",
             });
         }
     };
@@ -202,10 +202,10 @@ const EmailBlock = ({
     return (
         <div>
             <div className="my-4">
-                <h1 className="mb-8 text-4xl font-bold">Sign up to start listening</h1>
+                <h1 className="mb-8 text-4xl font-bold">Зареєструйтеся, щоб почати слухати</h1>
                 <div className="my-4">
                     <label className="block text-sm font-medium text-grey-800" htmlFor="email">
-                        Email address
+                        Електронна адреса
                     </label>
                     <input
                         className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full h-10 px-2 shadow-sm sm:text-sm border-gray-300 rounded-md"
@@ -226,7 +226,7 @@ const EmailBlock = ({
                 </div>
             ) : null}
             <Button type="button" onClick={() => handleButtonClick()} className="w-full mt-8 text-center">
-                Next Step
+                Наступний крок
             </Button>
         </div>
     );
@@ -298,10 +298,10 @@ const PersonalInfoBlock = ({
         let formIsValid = true;
 
         if (!username) {
-            setInfoError((prev) => ({ ...prev, username: "Please enter your name." }));
+            setInfoError((prev) => ({ ...prev, username: "Будь ласка, введіть ваше ім'я." }));
             formIsValid = false;
         } else if (!validateUsername(username)) {
-            setInfoError((prev) => ({ ...prev, username: "Your name must be at least 2 characters." }));
+            setInfoError((prev) => ({ ...prev, username: "Ваше ім'я повинно містити щонайменше 2 символи." }));
             formIsValid = false;
         } else {
             setInfoError((prev) => ({ ...prev, username: "" }));
@@ -310,7 +310,7 @@ const PersonalInfoBlock = ({
         if (!birthday.day || !birthday.month || !birthday.year) {
             setInfoError((prev) => ({
                 ...prev,
-                birthday: { ...prev.birthday, message: "Please enter your date of birth." },
+                birthday: { ...prev.birthday, message: "Будь ласка, введіть вашу дату народження." },
             }));
             formIsValid = false;
         } else {
@@ -322,7 +322,7 @@ const PersonalInfoBlock = ({
                 ...prev,
                 birthday: {
                     ...prev.birthday,
-                    day: "Please enter the day of your birth date as a number between 1 and 31.",
+                    day: "Будь ласка, введіть день вашої дати народження числом від 1 до 31.",
                 },
             }));
             formIsValid = false;
@@ -331,7 +331,10 @@ const PersonalInfoBlock = ({
         }
 
         if (!validateBirthdayMonth(birthday.month)) {
-            setInfoError((prev) => ({ ...prev, birthday: { ...prev.birthday, month: "Select your birth month." } }));
+            setInfoError((prev) => ({
+                ...prev,
+                birthday: { ...prev.birthday, month: "Виберіть місяць вашого народження." },
+            }));
             formIsValid = false;
         } else {
             setInfoError((prev) => ({ ...prev, birthday: { ...prev.birthday, month: "" } }));
@@ -342,14 +345,14 @@ const PersonalInfoBlock = ({
                 ...prev,
                 birthday: {
                     ...prev.birthday,
-                    year: "Please enter the year of your birth date using four digits (e.g., 1990).",
+                    year: "Будь ласка, введіть рік вашої дати народження, використовуючи чотири цифри (наприклад, 1990).",
                 },
             }));
             formIsValid = false;
         } else if (birthday.year > new Date().getFullYear() - 16) {
             setInfoError((prev) => ({
                 ...prev,
-                birthday: { ...prev.birthday, year: "You’re too young to create an account." },
+                birthday: { ...prev.birthday, year: "Ви занадто молоді для створення облікового запису." },
             }));
             formIsValid = false;
         } else {
@@ -357,10 +360,10 @@ const PersonalInfoBlock = ({
         }
 
         if (!gender) {
-            setInfoError((prev) => ({ ...prev, gender: "Please select your gender." }));
+            setInfoError((prev) => ({ ...prev, gender: "Будь ласка, виберіть вашу стать." }));
             formIsValid = false;
         } else if (!validateGender(gender)) {
-            setInfoError((prev) => ({ ...prev, gender: "Please select a valid gender." }));
+            setInfoError((prev) => ({ ...prev, gender: "Будь ласка, виберіть вашу стать." }));
             formIsValid = false;
         } else {
             setInfoError((prev) => ({ ...prev, gender: "" }));
@@ -377,7 +380,7 @@ const PersonalInfoBlock = ({
         <div>
             <div className="my-4">
                 <label className="block text-sm font-medium text-grey-800" htmlFor="username">
-                    Name
+                    Ім&apos;я
                 </label>
                 <input
                     className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full h-10 px-2 shadow-sm sm:text-sm border-gray-300 rounded-md"
@@ -398,7 +401,7 @@ const PersonalInfoBlock = ({
                 ))}
             {infoError.username && <div className="text-sm text-red-500">{infoError.username}</div>}
             <div className="my-4">
-                <div className="block text-sm font-medium text-grey-800">Date of birth</div>
+                <div className="block text-sm font-medium text-grey-800">Дата народження</div>
                 <div className="flex gap-2 w-full">
                     <input
                         className="mt-1 w-[50px] focus:ring-indigo-500 focus:border-indigo-500 block h-10 px-2 shadow-sm sm:text-sm border-gray-300 rounded-md"
@@ -422,7 +425,7 @@ const PersonalInfoBlock = ({
                         onChange={(e) => fields.birthday.setValue({ ...birthday, month: parseInt(e.target.value) })}
                     >
                         <option value={0} disabled>
-                            Month
+                            Місяць
                         </option>
                         {months.map((month) => (
                             <option key={month.value} value={month.value}>
@@ -455,7 +458,7 @@ const PersonalInfoBlock = ({
             {infoError.birthday.month && <div className="text-sm text-red-500">{infoError.birthday.month}</div>}
             {infoError.birthday.year && <div className="text-sm text-red-500">{infoError.birthday.year}</div>}
             <div className="my-4">
-                <div className="block text-sm font-medium text-grey-800">Gender</div>
+                <div className="block text-sm font-medium text-grey-800">Ґендер/стать</div>
                 <select
                     className="mt-1 w-full focus:ring-indigo-500 focus:border-indigo-500 block h-10 px-2 shadow-sm sm:text-sm border-gray-300 rounded-md"
                     name="gender"
@@ -465,7 +468,7 @@ const PersonalInfoBlock = ({
                     onChange={(e) => fields.gender.setValue(e.target.value)}
                 >
                     <option value={0} disabled>
-                        Gender
+                        Виберіть стать
                     </option>
                     {genders.map((gender) => (
                         <option key={gender.value} value={gender.value}>
@@ -482,7 +485,7 @@ const PersonalInfoBlock = ({
                 ))}
             {infoError.gender && <div className="text-sm text-red-500">{infoError.gender}</div>}
             <Button type="button" onClick={handleButtonClick} className="w-full mt-8 text-center">
-                Next Step
+                Наступний крок
             </Button>
         </div>
     );
@@ -511,7 +514,7 @@ const AgreeAcknowledgeBlock = () => {
                         required
                     />
                     <span className="block text-sm font-medium text-grey-800">
-                        I agree to the Terms and Conditions of Use and Privacy Policy.
+                        Я згоден із Умовами використання та Політикою конфіденційності.
                     </span>
                 </label>
                 <br />
@@ -524,7 +527,7 @@ const AgreeAcknowledgeBlock = () => {
                         className="focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm border-gray-300 rounded-md"
                     />
                     <span className="block text-sm font-medium text-grey-800">
-                        I would prefer not to receive marketing messages from Project Alpha.
+                        Я б хотів уникати отримання маркетингових повідомлень від Project Alpha.
                     </span>
                 </label>
             </div>
@@ -535,7 +538,7 @@ const AgreeAcknowledgeBlock = () => {
 export default function SignupForm() {
     const [step, setStep] = useState<number>(0);
     const [state, dispatch] = useFormState(signUp, undefined);
-    const steps = ["Create a password", "Tell about yourself", "Agreements and Acknowledgments"];
+    const steps = ["Створіть пароль", "Розкажіть про себе", "Угоди та підтвердження"];
     const router = useRouter();
 
     const [email, setEmail] = useState("");
@@ -597,7 +600,7 @@ export default function SignupForm() {
                                 </button>
                             </div>
                             <div className="flex md:w-[400px] gap-2 flex-col">
-                                <span className="text-gray-400">Step {step} of 3</span>
+                                <span className="text-gray-400">Крок {step} з 3</span>
                                 <h2>{steps[step - 1]}</h2>
                             </div>
                         </div>
@@ -659,7 +662,7 @@ function SignupButton() {
 
     return (
         <Button className="mt-4 w-full" aria-disabled={pending}>
-            {pending ? "Submitting..." : "Sign up"}
+            {pending ? "Надсилання..." : "Зареєструватися"}
         </Button>
     );
 }
