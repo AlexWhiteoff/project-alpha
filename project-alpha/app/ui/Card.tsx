@@ -1,7 +1,6 @@
 import { ExtendedEpisode, ExtendedPodcast } from "@/app/lib/definitions";
 import Image from "next/image";
 import Link from "next/link";
-import styles from "@/app/ui/Styles/text.module.css";
 
 export const PodcastCard = async ({ podcast }: { podcast: ExtendedPodcast }) => {
     return (
@@ -10,10 +9,11 @@ export const PodcastCard = async ({ podcast }: { podcast: ExtendedPodcast }) => 
                 <div className="relative w-36 md:w-48 rounded-lg overflow-hidden">
                     <Image
                         src={`/assets/podcasts/${podcast.id}/${podcast.avatar_url}`}
-                        className="object-cover h-[100%]"
+                        className="aspect-square object-cover h-[100%]"
                         alt={podcast.title}
                         width={300}
                         height={300}
+                        draggable={false}
                     />
                     <div className="absolute bottom-2 text-xs left-2 z-10 px-2 py-1 bg-neutral-900/80">
                         Епізодів: {podcast.episode_count}
@@ -37,10 +37,11 @@ export const EpisodeCard = async ({ episode }: { episode: ExtendedEpisode }) => 
                 <div className="relative w-36 md:w-48 rounded-lg overflow-hidden">
                     <Image
                         src={`/assets/podcasts/${episode.podcast_id}/${episode.id}/${episode.image_url}`}
-                        className="object-cover h-[100%]"
+                        className="aspect-square object-cover h-[100%]"
                         alt={episode.title}
                         width={300}
                         height={300}
+                        draggable={false}
                     />
                     <div className="absolute bottom-2 text-xs left-2 z-10 px-2 py-1 bg-neutral-900/80">Епізод</div>
                 </div>

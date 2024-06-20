@@ -116,7 +116,6 @@ export const PodcastFormSchema = z.object({
         ),
     author_id: z.string(),
     is_active: z.boolean(),
-    comments_enabled: z.boolean(),
     status: z.enum(["pending", "announced", "ongoing", "published", "discontinued", "archived"], {
         message: "Оберіть статус.",
     }),
@@ -264,7 +263,6 @@ export type Podcast = {
     banner_url: string;
     author_id: string;
     is_active: boolean;
-    comments_enabled: boolean;
     status: "pending" | "announced" | "ongoing" | "published" | "discontinued";
     age_rating: "0" | "6+" | "12+" | "16+" | "18+";
     created_at: string;

@@ -8,6 +8,7 @@ import { ChevronLeftIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outl
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import styles from "@/app/ui/Styles/form.module.css";
+import { lusitana } from "@/app/ui/fonts";
 
 const genders = [
     {
@@ -202,7 +203,7 @@ const EmailBlock = ({
     return (
         <div>
             <div className="my-4">
-                <h1 className="mb-8 text-4xl font-bold">Зареєструйтеся, щоб почати слухати</h1>
+                <h1 className={`${lusitana.className} mb-8 text-4xl`}>Зареєструйтеся, щоб почати слухати</h1>
                 <div className="my-4">
                     <label className="block text-sm font-medium text-grey-800" htmlFor="email">
                         Електронна адреса
