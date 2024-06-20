@@ -56,7 +56,6 @@ async function seedPodcasts(client) {
                 banner_url TEXT,
                 author_id UUID,
                 is_active BOOLEAN DEFAULT TRUE,
-                comments_enabled BOOLEAN DEFAULT TRUE,
                 status VARCHAR(20) DEFAULT 'pending',
                 age_rating VARCHAR(20) DEFAULT NULL,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -234,65 +233,6 @@ async function seedBookmarks(client) {
     }
 }
 
-async function seedComments(client) {
-    try {
-        await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
-        // Create the "comments" table if it doesn't exist
-        const createTable = await client.sql`
-            CREATE TABLE IF NOT EXISTS comments (
-                id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-                user_id UUID NOT NULL,
-                podcast_id UUID NOT NULL,
-                parent_comment_id UUID, 
-                content TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT NOW(),
-                updated_at TIMESTAMP DEFAULT NOW(),
-                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-                FOREIGN KEY (podcast_id) REFERENCES podcasts(id) ON DELETE CASCADE,
-                FOREIGN KEY (parent_comment_id) REFERENCES Comments(id) ON DELETE CASCADE
-            );
-        `;
-
-        console.log(`Created "comments" table`);
-
-        return {
-            createTable,
-        };
-    } catch (error) {
-        console.error("Error seeding comments:", error);
-        throw error;
-    }
-}
-
-async function seedRatings(client) {
-    try {
-        await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
-        // Create the "ratings" table if it doesn't exist
-        const createTable = await client.sql`
-            CREATE TABLE IF NOT EXISTS ratings (
-                rating_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-                user_id UUID NOT NULL,
-                podcast_id UUID NOT NULL,
-                rating INT NOT NULL, 
-                created_at TIMESTAMP DEFAULT NOW(),
-                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-                FOREIGN KEY (podcast_id) REFERENCES podcasts(id) ON DELETE CASCADE
-            );
-        `;
-
-        console.log(`Created "ratings" table`);
-
-        return {
-            createTable,
-        };
-    } catch (error) {
-        console.error("Error seeding ratings:", error);
-        throw error;
-    }
-}
-
 async function main() {
     const client = await db.connect();
 
@@ -304,8 +244,6 @@ async function main() {
     await seedPodcastTags(client);
     await seedEpisodes(client);
     await seedBookmarks(client);
-    await seedComments(client);
-    await seedRatings(client);
 
     await client.end();
 }

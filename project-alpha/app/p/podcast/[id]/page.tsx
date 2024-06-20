@@ -11,6 +11,7 @@ import EpisodeList from "@/app/ui/Episodes/EpisodeList";
 import { AddToBookmarkButton } from "@/app/ui/addToBookmarkButton";
 import { ListenPodcastButton } from "@/app/ui/buttons";
 import { Cog6ToothIcon } from "@heroicons/react/24/solid";
+import clsx from "clsx";
 import { format } from "date-fns";
 import { Metadata, ResolvingMetadata } from "next";
 import Image from "next/image";
@@ -66,12 +67,14 @@ export default async function Page({ params }: { params: { id: string } }) {
         { label: "Припинено", value: "discontinued" },
     ];
 
+    const isAuth = user?.role === "admin" || user?.userId === podcast.author_id;
+
     return (
         <main className="flex min-h-full justify-center">
             <div className="flex flex-col gap-4 max-w-[1168px] w-full md:rounded-lg overflow-y-auto">
                 <div
                     className={`flex items-center justify-center w-full ${
-                        podcast.banner_url ? "h-[200px] lg:h-[500px]" : "h-40"
+                        podcast.banner_url ? "h-[200px] lg:h-[500px]" : "h-48"
                     }`}
                 >
                     <Image
@@ -80,7 +83,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                         width={1168}
                         height={500}
                         draggable={false}
-                        className="aspect-[21/9] object-cover h-full"
+                        className={clsx("aspect-[21/9] object-cover h-full", { hidden: !podcast.banner_url })}
                     />
                 </div>
                 <div className="relative -mt-[50px] md:mt-0 flex flex-col items-center py-2 mx-4 md:mx-0 backdrop-blur bg-neutral-800/50 rounded-lg md:translate-y-0">
@@ -103,7 +106,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                                 <h1 className="text-2xl md:text-4xl font-bold">{podcast.title}</h1>
                             </div>
                         </div>
-                        {(podcast.author_id === user?.userId || user?.role === "admin") && (
+                        {isAuth && (
                             <div className="hidden md:block">
                                 <Link
                                     href={`/p/podcast/${podcast.id}/settings`}
@@ -220,7 +223,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                                 <p className="text-bold text-sm text-neutral-300">Епізоди</p>
                                 <div className="flex items-center flex-wrap gap-2 justify-start w-full">
                                     {episodes.length !== 0 ? (
-                                        <EpisodeList episodes={episodes} />
+                                        <EpisodeList episodes={episodes} isAuth={isAuth} />
                                     ) : (
                                         <div>Тут ще нема епізодів!</div>
                                     )}
