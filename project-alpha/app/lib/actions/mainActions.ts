@@ -32,7 +32,6 @@ const CreatePodcast = PodcastFormSchema.omit({
     id: true,
     author_id: true,
     is_active: true,
-    comments_enabled: true,
     status: true,
     created_at: true,
     updated_at: true,
@@ -287,16 +286,26 @@ export async function editPodcast(state: PodcastFormState, formData: FormData) {
                 console.log(key, value);
                 if (key === "avatar") {
                     const filePath = `/assets/podcasts/${id}/${podcast.avatar_url}`;
-                    await overwriteFile(filePath, value);
+                    Promise.all([
+                        overwriteFile(filePath, value),
+                        sql`
+                            UPDATE podcasts
+                            SET updated_at = ${updated_at}
+                            WHERE id = ${id}
+                        `,
+                    ]); 
                 } else if (key === "banner") {
-                    const filePath = `/assets/podcasts/${id}/${podcast.banner_url}`;
-                    await overwriteFile(filePath, value);
+                    const banner_url = podcast.banner_url || `${v4()}.${value.name.split(".").pop()}`;
+                    const filePath = `/assets/podcasts/${id}/${banner_url}`;
+                    Promise.all([
+                        overwriteFile(filePath, value),
+                        sql`
+                            UPDATE podcasts
+                            SET updated_at = ${updated_at}, banner_url = ${banner_url}
+                            WHERE id = ${id}
+                        `,
+                    ]);
                 }
-                await sql`
-                    UPDATE podcasts
-                    SET updated_at = ${updated_at}
-                    WHERE id = ${id}
-                `;
             }
         } else if (action === "update-classification") {
             const [podcastCategories, podcastTags, categories, tags] = await Promise.all([
@@ -361,13 +370,11 @@ export async function editPodcast(state: PodcastFormState, formData: FormData) {
         } else if (action === "update-management") {
             const dataToValidate: { [key: string]: any } = {
                 is_active: (formData.get("is_active") as string) === "true",
-                comments_enabled: (formData.get("comments_enabled") as string) === "true",
                 status: formData.get("status"),
             };
 
             const UpdatePodcast = PodcastFormSchema.pick({
                 is_active: true,
-                comments_enabled: true,
                 status: true,
             }).partial();
 
@@ -380,11 +387,11 @@ export async function editPodcast(state: PodcastFormState, formData: FormData) {
                 };
             }
 
-            const { is_active, comments_enabled, status } = validatedFields.data;
+            const { is_active, status } = validatedFields.data;
 
             await sql`
                 UPDATE podcasts
-                SET is_active = ${is_active}, comments_enabled = ${comments_enabled}, status = ${status}, updated_at = ${updated_at}
+                SET is_active = ${is_active}, status = ${status}, updated_at = ${updated_at}
                 WHERE id = ${id}
             `;
         } else {

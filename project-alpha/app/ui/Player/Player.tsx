@@ -69,7 +69,7 @@ const Player = () => {
                             <Image
                                 src={`/assets/podcasts/${episode.podcast_id}/${episode.id}/${episode.image_url}`}
                                 alt="Episode"
-                                className="object-cover h-full w-full"
+                                className="aspect-square object-cover h-full w-full"
                                 width={300}
                                 height={300}
                                 draggable={false}

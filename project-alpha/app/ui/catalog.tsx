@@ -272,7 +272,7 @@ export default function Catalog({
         <>
             <div className="md:relative flex flex-row justify-between items-center px-6 py-3 bg-neutral-800 rounded-lg">
                 <h1 className="text-xl md:text-2xl lg:text-4xl font-bold">Каталог</h1>
-                <div className="flex lg:hidden items-center gap-3">
+                <div className="flex items-center gap-3">
                     <div className="relative" ref={dropdownRef} onBlur={handleBlur}>
                         <button
                             type="button"
@@ -374,7 +374,7 @@ export default function Catalog({
                     <button
                         type="button"
                         onFocus={() => setIsFiltersOpen(true)}
-                        className="flex items-center gap-2 hover:bg-neutral-600 p-2 rounded-lg"
+                        className="lg:hidden flex items-center gap-2 hover:bg-neutral-600 p-2 rounded-lg"
                     >
                         <AdjustmentsVerticalIcon className="w-5" />
                         <span className="hidden md:block text-sm text-neutral-300">Фільтри</span>

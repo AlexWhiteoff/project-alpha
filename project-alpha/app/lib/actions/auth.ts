@@ -72,7 +72,7 @@ export async function signIn(state: { message: string } | undefined, formData: F
 
     if (!validatedFields.success) {
         return {
-            message: "Invalid credentials.",
+            message: "Неправильний логін або пароль.",
         };
     }
 
@@ -82,7 +82,7 @@ export async function signIn(state: { message: string } | undefined, formData: F
 
     if (!user) {
         return {
-            message: "Something went wrong.",
+            message: "Неправильний логін або пароль.",
         };
     }
 
@@ -92,7 +92,7 @@ export async function signIn(state: { message: string } | undefined, formData: F
         await createSession({ userId: user.id, role: user.role, name: user.username, avatar_url: user.avatar_url });
     else
         return {
-            message: "Invalid credentials.",
+            message: "Неправильний логін або пароль.",
         };
 
     revalidatePath("/");

@@ -12,15 +12,9 @@ const ManagementTab = ({
     user_role: "admin" | "content_creator" | "user";
 }) => {
     const [state, dispatch] = useFormState(editPodcast, undefined);
-    const [isCommentsOn, setIsCommentsOn] = useState(podcast.comments_enabled);
     const [status, setStatus] = useState(podcast.status);
     const [isActive, setIsActive] = useState(podcast.is_active);
     const [formChanged, setFormChanged] = useState(false);
-
-    const toggleComments = () => {
-        setIsCommentsOn((prevState) => !prevState);
-        setFormChanged(true);
-    };
 
     const toggleActive = () => {
         setIsActive((prevState) => !prevState);
@@ -33,7 +27,6 @@ const ManagementTab = ({
     };
 
     const handleCancel = () => {
-        setIsCommentsOn(podcast.comments_enabled);
         setIsActive(podcast.is_active);
         setStatus(podcast.status);
         setFormChanged(false);
@@ -47,7 +40,6 @@ const ManagementTab = ({
         data.set("action", "update-management");
         data.set("status", status);
         data.set("is_active", `${isActive}`);
-        data.set("comments_enabled", `${isCommentsOn}`);
 
         dispatch(data);
     };
@@ -111,30 +103,6 @@ const ManagementTab = ({
                                 Випуск закінчено
                             </option>
                         </select>
-                    </div>
-                </div>
-                <div className="flex flex-row items-center justify-between">
-                    <label htmlFor="comments_enabled" className="block text-md font-medium text-neutral-300">
-                        Коментарі
-                    </label>
-
-                    <div className="relative flex w-10 items-center select-none">
-                        <input
-                            type="checkbox"
-                            className={`transition-all toggle-checkbox absolute block w-6 h-6 rounded-full bg-neutral-100 border-4 border-neutral-300 appearance-none cursor-pointer ${
-                                isCommentsOn ? "right-0" : "right-4"
-                            }`}
-                            name="comments_enabled"
-                            id="comments_enabled"
-                            onChange={toggleComments}
-                            checked={isCommentsOn}
-                        />
-                        <label
-                            htmlFor="comments_enabled"
-                            className={`transition-all toggle-label block overflow-hidden h-5 w-10 rounded-full cursor-pointer ${
-                                isCommentsOn ? "bg-blue-500" : "bg-neutral-500"
-                            }`}
-                        />
                     </div>
                 </div>
             </div>
