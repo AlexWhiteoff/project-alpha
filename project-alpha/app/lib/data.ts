@@ -200,7 +200,6 @@ export async function getFilteredPodcasts(
             Podcasts.banner_url, 
             Podcasts.author_id, 
             Podcasts.is_active, 
-            Podcasts.comments_enabled, 
             Podcasts.status, 
             Podcasts.age_rating, 
             Podcasts.created_at, 
@@ -212,8 +211,7 @@ export async function getFilteredPodcasts(
         ORDER BY
             ${sortByClause}
     `;
-    console.log(values);
-    console.log(queryString);
+
     try {
         const data = await sql.query(queryString, values);
         return data.rows;
@@ -480,6 +478,7 @@ export async function getRecentEpisodes() {
             WHERE 
                 p.status != 'pending'
                 AND p.is_active = true
+                AND e.is_active = true
             ORDER BY e.created_at DESC
             LIMIT 10
         `;
@@ -497,8 +496,8 @@ export async function fetchPodcastEpisodes(podcast_id: string) {
         const data = await sql<ExtendedEpisode>`
             SELECT 
                 e.*, 
-                p.title as podcast_title, 
-                u.username as author_name
+                p.title as podcast_title,
+                u.id as author_id
             FROM 
                 episodes e
             JOIN 
