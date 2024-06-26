@@ -198,7 +198,7 @@ export async function EpisodeTable({ query, currentPage }: { query: string; curr
                                                     ></div>
                                                     <Image
                                                         src={`/assets/podcasts/${episode.podcast_id}/${episode.id}/${episode.image_url}`}
-                                                        className="mr-2 rounded-full"
+                                                        className="mr-2 rounded-full aspect-square"
                                                         width={50}
                                                         height={50}
                                                         alt={`${episode.title} episode picture`}
@@ -291,7 +291,7 @@ export async function EpisodeTable({ query, currentPage }: { query: string; curr
                                                     ></div>
                                                     <Image
                                                         src={`/assets/podcasts/${episode.podcast_id}/${episode.id}/${episode.image_url}`}
-                                                        className="rounded-lg"
+                                                        className="rounded-lg aspect-square"
                                                         alt={`${episode.title} episode picture`}
                                                         width={50}
                                                         height={50}
