@@ -733,13 +733,11 @@ export async function fetchPodcastsPages(query: string) {
     noStore();
 
     const count = await sql`
-        SELECT COUNT(*)
+        SELECT COUNT(p.*)
         FROM 
             Podcasts p
         JOIN 
             Users u ON p.author_id = u.id
-        LEFT JOIN 
-            Episodes e ON p.id = e.podcast_id
         WHERE
 		    p.title ILIKE ${`%${query}%`} OR
             u.username ILIKE ${`%${query}%`}

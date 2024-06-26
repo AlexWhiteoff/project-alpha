@@ -56,9 +56,7 @@ const EpisodeList = ({ episodes, isAuth }: { episodes: ExtendedEpisode[]; isAuth
                                                 <UpdateEpisode id={episode.id} />
                                                 <DeleteEpisode id={episode.id} />
                                             </div>
-                                            <button className="transition-all text-neutral-300 relative p-3 flex justify-center items-center rounded-full hover:bg-neutral-800 hover:text-neutral-100">
-                                                <PlayIcon className="w-6" />
-                                            </button>
+                                            <PlayButton episode={episode} />
                                         </div>
                                     </div>
                                 </div>
