@@ -93,7 +93,9 @@ const Player = () => {
                     </div>
 
                     <div className="w-full flex items-center px-2">
-                        <span className="flex items-center justify-end w-10 text-sm">{formatTime(currentTime)}</span>
+                        <span className="flex items-center justify-end w-10 text-sm" aria-label="timer">
+                            {formatTime(currentTime)}
+                        </span>
                         <input
                             type="range"
                             min="0"
@@ -102,7 +104,9 @@ const Player = () => {
                             onChange={handleProgressChange}
                             className="mx-4 flex-1"
                         />
-                        <span className="flex items-center justify-start w-10 text-sm">{formatTime(duration)}</span>
+                        <span className="flex items-center justify-start w-10 text-sm" aria-label="duration">
+                            {formatTime(duration)}
+                        </span>
                     </div>
 
                     <div className="flex justify-center items-center gap-4">
@@ -112,6 +116,7 @@ const Player = () => {
                                 isLooping ? "text-blue-500" : "text-neutral-300"
                             )}
                             onClick={() => loopAudio()}
+                            aria-label="loop"
                         >
                             <ArrowPathIcon className="w-5" />
                         </button>
@@ -119,6 +124,7 @@ const Player = () => {
                         <button
                             className="relative flex w-8 h-8 items-center justify-center rounded-full hover:bg-neutral-700"
                             onClick={() => skipBackward()}
+                            aria-label="fifteen seconds backward"
                         >
                             <ArrowUturnLeftIcon className="w-6" />
                             <span className="absolute left-0 bottom-0 text-[10px]">15</span>
@@ -128,6 +134,7 @@ const Player = () => {
                             <button
                                 className="rounded-full hover:bg-neutral-700 focus:outline-none"
                                 onClick={() => playAudio()}
+                                aria-label="play"
                             >
                                 <PlayCircleIcon className="w-10 h-10" />
                             </button>
@@ -135,6 +142,7 @@ const Player = () => {
                             <button
                                 className="rounded-full hover:bg-neutral-700 focus:outline-none"
                                 onClick={() => pauseAudio()}
+                                aria-label="pause"
                             >
                                 <PauseCircleIcon className="w-10 h-10" />
                             </button>
@@ -143,6 +151,7 @@ const Player = () => {
                         <button
                             className="relative flex w-8 h-8 items-center justify-center rounded-full hover:bg-neutral-700"
                             onClick={() => skipForward()}
+                            aria-label="fifteen seconds forward"
                         >
                             <ArrowUturnRightIcon className="w-6" />
                             <span className="absolute right-0 bottom-0 text-[10px]">15</span>
@@ -152,6 +161,7 @@ const Player = () => {
                             <button
                                 className="flex w-8 h-8 items-center justify-center rounded-full hover:bg-neutral-700 text-neutral-300"
                                 onClick={() => setIsVolumeMenuOpened((prevState) => !prevState)}
+                                aria-label="toggle volume menu"
                             >
                                 <SpeakerWaveIcon className="w-5" />
                             </button>
@@ -169,6 +179,7 @@ const Player = () => {
                                     defaultValue="0.5"
                                     className="vertical"
                                     onChange={(e) => changeVolume(parseFloat(e.target.value))}
+                                    aria-label="volume"
                                 />
                             </div>
                         </div>
@@ -209,6 +220,7 @@ const Player = () => {
                                 <button
                                     className="relative flex w-8 h-8 items-center justify-center rounded-full hover:bg-neutral-700"
                                     onClick={() => skipBackward()}
+                                    aria-label="fifteen seconds backward"
                                 >
                                     <ArrowUturnLeftIcon className="w-6" />
                                     <span className="absolute left-0 bottom-0 text-[10px]">15</span>
@@ -218,6 +230,7 @@ const Player = () => {
                                     <button
                                         className="rounded-full hover:bg-neutral-700 focus:outline-none"
                                         onClick={() => playAudio()}
+                                        aria-label="play"
                                     >
                                         <PlayCircleIcon className="w-10 h-10" />
                                     </button>
@@ -225,6 +238,7 @@ const Player = () => {
                                     <button
                                         className="rounded-full hover:bg-neutral-700 focus:outline-none"
                                         onClick={() => pauseAudio()}
+                                        aria-label="pause"
                                     >
                                         <PauseCircleIcon className="w-10 h-10" />
                                     </button>
@@ -233,6 +247,7 @@ const Player = () => {
                                 <button
                                     className="relative flex w-8 h-8 items-center justify-center rounded-full hover:bg-neutral-700"
                                     onClick={() => skipForward()}
+                                    aria-label="fifteen seconds forward"
                                 >
                                     <ArrowUturnRightIcon className="w-6" />
                                     <span className="absolute right-0 bottom-0 text-[10px]">15</span>
@@ -246,6 +261,7 @@ const Player = () => {
                             <button
                                 className="absolute top-3 left-3 flex gap-2 items-center p-3 text-neutral-400 hover:bg-neutral-700 rounded-full"
                                 onClick={() => setIsPhonePlayerOpened(false)}
+                                aria-label="hide player window"
                             >
                                 <ChevronDownIcon className="w-5" />
                             </button>
@@ -302,6 +318,7 @@ const Player = () => {
                                         isLooping ? "text-blue-500" : "text-neutral-300"
                                     )}
                                     onClick={() => loopAudio()}
+                                    aria-label="loop"
                                 >
                                     <ArrowPathIcon className="w-5" />
                                 </button>
@@ -309,6 +326,7 @@ const Player = () => {
                                 <button
                                     className="relative flex w-8 h-8 items-center justify-center rounded-full hover:bg-neutral-700"
                                     onClick={() => skipBackward()}
+                                    aria-label="fifteen seconds backward"
                                 >
                                     <ArrowUturnLeftIcon className="w-6" />
                                     <span className="absolute left-0 bottom-0 text-[10px]">15</span>
@@ -318,6 +336,7 @@ const Player = () => {
                                     <button
                                         className="rounded-full hover:bg-neutral-700 focus:outline-none"
                                         onClick={() => playAudio()}
+                                        aria-label="play"
                                     >
                                         <PlayCircleIcon className="w-10 h-10" />
                                     </button>
@@ -325,6 +344,7 @@ const Player = () => {
                                     <button
                                         className="rounded-full hover:bg-neutral-700 focus:outline-none"
                                         onClick={() => pauseAudio()}
+                                        aria-label="pause"
                                     >
                                         <PauseCircleIcon className="w-10 h-10" />
                                     </button>
@@ -333,6 +353,7 @@ const Player = () => {
                                 <button
                                     className="relative flex w-8 h-8 items-center justify-center rounded-full hover:bg-neutral-700"
                                     onClick={() => skipForward()}
+                                    aria-label="fifteen seconds forward"
                                 >
                                     <ArrowUturnRightIcon className="w-6" />
                                     <span className="absolute right-0 bottom-0 text-[10px]">15</span>
@@ -342,6 +363,7 @@ const Player = () => {
                                     <button
                                         className="flex w-8 h-8 items-center justify-center rounded-full hover:bg-neutral-700 text-neutral-300"
                                         onClick={() => setIsVolumeMenuOpened((prevState) => !prevState)}
+                                        aria-label="toggle volume menu"
                                     >
                                         <SpeakerWaveIcon className="w-5" />
                                     </button>
@@ -359,6 +381,7 @@ const Player = () => {
                                             defaultValue="0.5"
                                             className="vertical"
                                             onChange={(e) => changeVolume(parseFloat(e.target.value))}
+                                            aria-label="volume"
                                         />
                                     </div>
                                 </div>

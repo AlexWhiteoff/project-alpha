@@ -7,8 +7,11 @@ import { redirect } from "next/navigation";
 import bcrypt from "bcrypt";
 import { createSession, deleteSession } from "@/app/lib/actions/session";
 import { getUserByEmail } from "@/app/lib/data";
+import { performance } from "perf_hooks";
 
 export async function signUp(state: UserFormState, formData: FormData) {
+    const startTime = performance.now();
+
     const validatedFields = SignupFormSchema.safeParse({
         email: formData.get("email"),
         password: formData.get("password"),
@@ -38,11 +41,14 @@ export async function signUp(state: UserFormState, formData: FormData) {
     const birthday_date = `${birthday_year}-${birthday_month}-${birthday_day}`;
     const hashedPassword = await bcrypt.hash(password, 10);
     try {
+        const insertStartTime = performance.now();
         const result = await sql`
         INSERT INTO users (email, password, username, birthday_date, gender)
         VALUES (${email.toLowerCase()}, ${hashedPassword}, ${username}, ${birthday_date}, ${gender})
         RETURNING id, role;
         `;
+        const insertEndTime = performance.now();
+        console.log(`Call to insert data to db took ${insertEndTime - insertStartTime} milliseconds`);
 
         const user = result.rows[0];
 
@@ -51,8 +57,12 @@ export async function signUp(state: UserFormState, formData: FormData) {
                 message: "Під час створення вашого облікового запису виникла помилка.",
             };
         }
-
+        //
+        const createSessionStartTime = performance.now();
         await createSession({ userId: user.id, role: user.role, name: username, avatar_url: null });
+        const createSessionEndTime = performance.now();
+        console.log(`Call to create session took ${createSessionEndTime - createSessionStartTime} milliseconds`);
+        //
     } catch (error) {
         return {
             message: "Database Error: Failed to create user.",
@@ -60,11 +70,15 @@ export async function signUp(state: UserFormState, formData: FormData) {
         };
     }
 
+    const endTime = performance.now();
+    console.log(`Call to sign up took ${endTime - startTime} milliseconds`);
+
     revalidatePath("/");
     redirect("/p/");
 }
 
 export async function signIn(state: { message: string } | undefined, formData: FormData) {
+    const startTime = performance.now();
     const validatedFields = SigninFormSchema.safeParse({
         email: formData.get("email"),
         password: formData.get("password"),
@@ -88,13 +102,18 @@ export async function signIn(state: { message: string } | undefined, formData: F
 
     const passwordsMatch = await bcrypt.compare(password, user.password);
 
-    if (passwordsMatch)
+    if (passwordsMatch) {
+        const sessionCreationStartTime = performance.now();
         await createSession({ userId: user.id, role: user.role, name: user.username, avatar_url: user.avatar_url });
-    else
+        const sessionCreationEndTime = performance.now();
+        console.log(`Call to create session took ${sessionCreationEndTime - sessionCreationStartTime} milliseconds`);
+    } else
         return {
             message: "Неправильний логін або пароль.",
         };
 
+    const endTime = performance.now();
+    console.log(`Call to sign in took ${endTime - startTime} milliseconds`);
     revalidatePath("/");
     redirect("/p/");
 }
