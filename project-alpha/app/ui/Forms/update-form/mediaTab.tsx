@@ -77,7 +77,9 @@ const MediaTab = ({ podcast }: { podcast: Podcast }) => {
                         <p className="text-sm text-center">Натисніть або перетягніть зображення</p>
                     </ImageInput>
                     <div id="cover-image-error" aria-live="polite" aria-atomic="true">
-                        {state?.errors?.avatar &&
+                        {state?.errors &&
+                            "avatar" in state?.errors &&
+                            state?.errors?.avatar &&
                             state.errors.avatar.map((error: string) => (
                                 <p className="mt-2 text-sm text-red-500" key={error}>
                                     {error}
@@ -103,7 +105,9 @@ const MediaTab = ({ podcast }: { podcast: Podcast }) => {
                         <p className="text-sm text-center">Натисніть або перетягніть зображення</p>
                     </ImageInput>
                     <div id="banner-image-error" aria-live="polite" aria-atomic="true">
-                        {state?.errors?.banner &&
+                        {state?.errors &&
+                            "banner" in state?.errors &&
+                            state?.errors?.banner &&
                             state.errors.banner.map((error: string) => (
                                 <p className="mt-2 text-sm text-red-500" key={error}>
                                     {error}

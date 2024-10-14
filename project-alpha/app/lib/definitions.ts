@@ -188,16 +188,25 @@ export const addToBookmarkSchema = z.object({
     updated_at: z.string(),
 });
 
+export type MainDataErrors = {
+    title?: string[];
+    description?: string[];
+    age_rating?: string[];
+};
+
+export type MediaErrors = {
+    avatar?: string[];
+    banner?: string[];
+};
+
+export type ManagementErrors = {
+    status?: string[];
+    is_active?: string[];
+};
+
 export type PodcastFormState =
     | {
-          errors?: {
-              title?: string[];
-              description?: string[];
-              avatar?: string[];
-              banner?: string[];
-              status?: string[];
-              age_rating?: string[];
-          };
+          errors?: MainDataErrors | MediaErrors | ManagementErrors;
           message?: string;
       }
     | undefined;
@@ -279,17 +288,6 @@ export type Episode = {
     is_active: boolean;
     created_at: string;
     updated_at: string;
-};
-
-export type EpisodeTable = {
-    id: string;
-    podcast_id: string;
-    title: string;
-    description: string;
-    audio_url: string;
-    image_url: string;
-    is_active: boolean;
-    created_at: string;
 };
 
 export type Categories = {

@@ -2,7 +2,6 @@ import {
     Bookmarks,
     Categories,
     Episode,
-    EpisodeTable,
     EpisodeTableType,
     ExtendedEpisode,
     ExtendedPodcast,
@@ -327,16 +326,8 @@ export async function fetchFilteredEpisodes(podcastId: string, query: string) {
     noStore();
 
     try {
-        const episodes = await sql<EpisodeTable>`
-            SELECT 
-                id,
-                podcast_id,
-                title,
-                description,
-                audio_url,
-                image_url,    
-                is_active,
-                created_at
+        const episodes = await sql<Episode>`
+            SELECT *
             FROM episodes
             WHERE 
                 podcast_id = ${podcastId} AND

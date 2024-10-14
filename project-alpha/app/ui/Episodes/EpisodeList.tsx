@@ -2,7 +2,7 @@ import Image from "next/image";
 import { UpdateEpisode, DeleteEpisode, PlayButton } from "@/app/ui/buttons";
 import Link from "next/link";
 import { PlayIcon } from "@heroicons/react/24/solid";
-import { ExtendedEpisode, User } from "@/app/lib/definitions";
+import { Episode, ExtendedEpisode, User } from "@/app/lib/definitions";
 import { formatDateToLocal } from "@/app/ui/utils";
 import clsx from "clsx";
 import styles from "@/app/ui/Styles/text.module.css";

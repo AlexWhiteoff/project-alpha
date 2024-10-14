@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Categories, EpisodeTable, Podcast, Tags } from "@/app/lib/definitions";
+import { Categories, Episode, Podcast, Tags } from "@/app/lib/definitions";
 import Link from "next/link";
 import {
     DocumentTextIcon as OutlineDocumentTextIcon,
@@ -33,7 +33,7 @@ interface PodcastFormProps {
     podcastTags: Tags[];
     categories: Categories[];
     tags: Tags[];
-    episodes: EpisodeTable[];
+    episodes: Episode[];
 }
 
 const tabs = [
@@ -135,7 +135,7 @@ export default function PodcastEditForm({
                             />
                         )}
                         {activeTab === 3 && <ManagementTab podcast={podcast} user_role={user_role} />}
-                        {activeTab === 4 && <EpisodesTab podcastId={podcast.id} episodes={episodes} />}
+                        {activeTab === 4 && <EpisodesTab podcast={podcast} episodes={episodes} />}
                     </div>
                 </div>
             </div>

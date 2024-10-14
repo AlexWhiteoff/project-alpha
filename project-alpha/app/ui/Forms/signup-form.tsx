@@ -9,6 +9,7 @@ import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import styles from "@/app/ui/Styles/form.module.css";
 import { lusitana } from "@/app/ui/fonts";
+import Link from "next/link";
 
 const genders = [
     {
@@ -174,7 +175,6 @@ const EmailBlock = ({
 }) => {
     const email = value;
     const [emailError, setEmailError] = useState({ status: false, message: "" });
-    const [isFormValid, setIsFormValid] = useState(false);
 
     const validateEmail = (email: string) => {
         return email.match(
@@ -189,10 +189,8 @@ const EmailBlock = ({
         }
 
         if (validateEmail(email)) {
-            setIsFormValid(true);
             NextStep();
         } else {
-            setIsFormValid(false);
             setEmailError({
                 status: true,
                 message: "Ця електронна адреса недійсна. Переконайтеся, що вона написана в форматі: example@email.com.",
@@ -563,6 +561,10 @@ export default function SignupForm() {
         router.replace(`/signup#step=${step}`);
     }, [step, router]);
 
+    useEffect(() => {
+        setStep(0);
+    }, [state]);
+
     const handleSubmit = (formData: FormData) => {
         if (!email || !password || !username || !birthday.day || !birthday.month || !birthday.year || !gender) {
             return;
@@ -653,6 +655,13 @@ export default function SignupForm() {
                         </>
                     )}
                 </div>
+                <Link
+                    href={"/login"}
+                    className="flex justify-center transition-colors mt-4 text-center py-2 hover:text-neutral-300"
+                    aria-label="Log in"
+                >
+                    <span>Увійти</span>
+                </Link>
             </div>
         </form>
     );

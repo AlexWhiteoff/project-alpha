@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/app/ui/button";
 import { useFormState } from "react-dom";
 import { editPodcast } from "@/app/lib/actions/mainActions";
-import { Podcast } from "@/app/lib/definitions";
+import { MainDataErrors, Podcast } from "@/app/lib/definitions";
 
 const MainInfoTab = ({ podcast }: { podcast: Podcast }) => {
     const [state, dispatch] = useFormState(editPodcast, undefined);
@@ -64,7 +64,9 @@ const MainInfoTab = ({ podcast }: { podcast: Podcast }) => {
                         onChange={handleInputChange}
                     />
                     <div id="title-error" aria-live="polite" aria-atomic="true">
-                        {state?.errors?.title &&
+                        {state?.errors &&
+                            "title" in state?.errors &&
+                            state?.errors?.title &&
                             state.errors.title.map((error: string) => (
                                 <p className="mt-2 text-sm text-red-500" key={error}>
                                     {error}
@@ -87,7 +89,9 @@ const MainInfoTab = ({ podcast }: { podcast: Podcast }) => {
                         defaultValue={podcast.description}
                     />
                     <div id="description-error" aria-live="polite" aria-atomic="true">
-                        {state?.errors?.description &&
+                        {state?.errors &&
+                            "description" in state?.errors &&
+                            state?.errors?.description &&
                             state.errors.description.map((error: string) => (
                                 <p className="mt-2 text-sm text-red-500" key={error}>
                                     {error}
@@ -129,7 +133,9 @@ const MainInfoTab = ({ podcast }: { podcast: Podcast }) => {
                         </option>
                     </select>
                     <div id="age_rating-error" aria-live="polite" aria-atomic="true">
-                        {state?.errors?.age_rating &&
+                        {state?.errors &&
+                            "age_rating" in state?.errors &&
+                            state?.errors?.age_rating &&
                             state.errors.age_rating.map((error: string) => (
                                 <p className="mt-2 text-sm text-red-500" key={error}>
                                     {error}
