@@ -1,8 +1,8 @@
 # Ukrainian
 
-# Вебзастосунок для прослуховування подкастів
+## Вебзастосунок для прослуховування подкастів
 
-## Project Alpha
+### Project Alpha
 
 *Next.js, TypeScript, Tailwind CSS, PostgreSQL*
 
@@ -12,9 +12,9 @@
 
 # English
 
-# Podcast Listening Web Application
+## Podcast Listening Web Application
 
-## Project Alpha
+### Project Alpha
 
 *Next.js, TypeScript, Tailwind CSS, PostgreSQL*
 
